@@ -35,6 +35,10 @@ class RecentTradesAdapter (private var recentTradesList: ArrayList<RecentTrade>)
         holder.tradeSize.text = recentTrade.size.toString()
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd hh:mma", Locale.ENGLISH)
         holder.tradeTime.text = simpleDateFormat.format(Date(recentTrade.timestamp!!/1000))
-        holder.tradeTaker.text = recentTrade.buyerRole.toString()
+        if (recentTrade.sellerRole.equals("taker", true)) {
+            holder.tradeTaker.text = "S"
+        } else if (recentTrade.buyerRole.equals("taker", true)) {
+            holder.tradeTaker.text = "B"
+        }
     }
 }
