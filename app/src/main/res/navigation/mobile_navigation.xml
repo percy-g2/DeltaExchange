@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_order">
+
+    <fragment
+        android:id="@+id/navigation_order"
+        android:name="crypto.delta.exchange.openexchange.ui.order.OrderFragment"
+        android:label="@string/title_order"
+        tools:layout="@layout/fragment_order" />
+
+    <fragment
+        android:id="@+id/navigation_chart"
+        android:name="crypto.delta.exchange.openexchange.ui.chart.ChartFragment"
+        android:label="@string/title_chart"
+        tools:layout="@layout/fragment_chart" />
+
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="crypto.delta.exchange.openexchange.ui.settings.SettingsFragment"
+        android:label="@string/settings" />
+</navigation>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#28334a</color>
+    <color name="colorAccent">#148bee</color>
+    <color name="colorPrimaryDark">#212b40</color>
+
+    <color name="colorPrimaryDusk">#3c4862</color>
+    <color name="colorPrimaryAlternate">#253047</color>
+
+    <color name="backgroundColor">#BF212b40</color>
+
+    <color name="bottomNavSelected">#148bee</color>
+    <color name="bottomNavUnSelected">#ffffff</color>
+
+    <color name="primaryTextColor">#ffffff</color>
+    <color name="textColorSecondary">#ffffff</color>
+
+    <color name="colorOrange">#f4a60e</color>
+    <color name="colorBid">#27823b</color>
+    <color name="colorAsk">#cc3618</color>
+
+    <color name="color_table_title_background_bid_price">@color/colorBid</color>
+    <color name="color_table_title_background_ask_price">@color/colorAsk</color>
+    <color name="color_table_title_background_bid_amount">#696969</color>
+    <color name="color_table_title_background_ask_amount">#696969</color>
+    <color name="color_table_title_text">@android:color/white</color>
+</resources>

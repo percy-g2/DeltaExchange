@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="10"
+    tools:context=".ui.order.OrderFragment">
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".8"
+        app:tabBackground="@color/colorPrimary"
+        app:tabGravity="fill"
+        app:tabIndicatorColor="@color/colorAccent"
+        app:tabMode="fixed"
+        app:tabTextColor="@color/primaryTextColor" />
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="8.4" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCreateOrder"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="?attr/actionBarSize"
+        android:layout_weight=".8"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:text="@string/create_order" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

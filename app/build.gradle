@@ -1,0 +1,112 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+
+    defaultConfig {
+        applicationId "crypto.delta.exchange.openexchange"
+        minSdkVersion 22
+        targetSdkVersion 29
+        versionCode 1
+        versionName "alpha-1.0"
+        ndk.abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+        externalNativeBuild {
+            cmake {
+                cppFlags ""
+            }
+        }
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            versionNameSuffix '-release'
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        unsigned {
+            versionNameSuffix '-unsigned'
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig null
+        }
+        debug {
+            versionNameSuffix '-debug'
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        android.applicationVariants.all { variant ->
+            variant.outputs.all {
+                outputFileName = "DeltaExchange-${variant.versionName}.apk"
+            }
+        }
+    }
+
+// To inline the bytecode built with JVM target 1.8 into
+// bytecode that is being built with JVM target 1.6. (e.g. navArgs)
+
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+            version "3.10.2"
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.core:core-ktx:1.3.0'
+    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.navigation:navigation-fragment:2.2.2'
+    implementation 'androidx.navigation:navigation-ui:2.2.2'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.2.2'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.2.2'
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+
+    implementation "com.squareup.retrofit2:retrofit:2.9.0"
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation "com.squareup.retrofit2:converter-gson:2.9.0"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:2.9.0"
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation "com.squareup.okhttp3:logging-interceptor:4.7.2"
+
+    implementation 'com.tinder.scarlet:scarlet:0.1.10'
+    // Optional
+    implementation "com.tinder.scarlet:websocket-okhttp:0.1.10"
+    implementation "com.tinder.scarlet:stream-adapter-rxjava2:0.1.10"
+    implementation "com.tinder.scarlet:message-adapter-moshi:0.1.10"
+    implementation "com.tinder.scarlet:lifecycle-android:0.1.10"
+
+    //charts
+    implementation 'com.liihuu.widget:klinechart:2.2.3'
+
+    //tickseekbar
+    implementation 'com.github.warkiz.tickseekbar:tickseekbar:0.1.4'
+
+    implementation 'androidx.preference:preference:1.1.1'
+
+    implementation 'com.github.GrenderG:Toasty:1.4.2'
+
+    testImplementation 'junit:junit:4.13'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+}

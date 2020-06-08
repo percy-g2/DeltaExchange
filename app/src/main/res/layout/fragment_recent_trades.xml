@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.order.RecentTradesFragment">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDusk">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:textAllCaps="true"
+                app:layout_constraintGuide_percent=".5" />
+
+            <TextView
+                android:id="@+id/tradePrice"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin"
+                android:layout_marginTop="@dimen/margin_half"
+                android:layout_marginBottom="@dimen/margin_half"
+                android:gravity="center"
+                android:text="@string/price"
+                android:textAllCaps="true"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/tradeSize"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tradeSize"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_half"
+                android:layout_marginEnd="@dimen/margin_half"
+                android:gravity="center"
+                android:text="@string/size"
+                android:textAllCaps="true"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintBaseline_toBaselineOf="@+id/tradePrice"
+                app:layout_constraintEnd_toStartOf="@+id/guideline"
+                app:layout_constraintStart_toEndOf="@+id/tradePrice" />
+
+            <TextView
+                android:id="@+id/tradeTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_half"
+                android:layout_marginEnd="@dimen/margin_half"
+                android:gravity="center"
+                android:text="@string/time"
+                android:textAllCaps="true"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintBaseline_toBaselineOf="@+id/tradePrice"
+                app:layout_constraintEnd_toStartOf="@+id/tradeTaker"
+                app:layout_constraintStart_toEndOf="@+id/guideline" />
+
+            <TextView
+                android:id="@+id/tradeTaker"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin"
+                android:gravity="center"
+                android:text="@string/taker"
+                android:textAllCaps="true"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:layout_constraintBaseline_toBaselineOf="@+id/tradePrice"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/tradeTime" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context=".fragment.RecentTradesFragment"
+                tools:listitem="@layout/adapter_recent_trades" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <ProgressBar
+        android:id="@+id/chartProgressSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="8dp"
+        android:indeterminate="true" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

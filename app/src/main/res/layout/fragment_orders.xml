@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.order.OrderBookFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:background="@color/colorPrimaryDusk"
+        android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent=".5" />
+
+        <TextView
+            android:id="@+id/size_bid"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_half"
+            android:layout_marginStart="@dimen/margin"
+            android:layout_marginTop="@dimen/margin_half"
+            android:gravity="end"
+            android:text="@string/size"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/price_bid"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/price_bid"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_half"
+            android:layout_marginStart="@dimen/margin_half"
+            android:gravity="end"
+            android:text="@string/price"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintBaseline_toBaselineOf="@+id/size_bid"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintStart_toEndOf="@+id/size_bid" />
+
+        <TextView
+            android:id="@+id/price_ask"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_half"
+            android:layout_marginStart="@dimen/margin_half"
+            android:text="@string/price"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintBaseline_toBaselineOf="@+id/size_bid"
+            app:layout_constraintEnd_toStartOf="@+id/amount_ask"
+            app:layout_constraintStart_toEndOf="@+id/guideline" />
+
+        <TextView
+            android:id="@+id/amount_ask"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin"
+            android:text="@string/size"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintBaseline_toBaselineOf="@+id/size_bid"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/price_ask" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".fragment.PriceOrderBookFragment"
+        tools:listitem="@layout/adapter_order_book" />
+</LinearLayout>
