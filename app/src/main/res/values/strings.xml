@@ -50,4 +50,5 @@
     <string name="limit_price_is_zero">Limit price can\'t be zero</string>
     <string name="quantity_is_zero">Quantity can\'t be zero</string>
     <string name="configure_api_key_first">Configure API key first</string>
+    <string name="post_only_flag_is_for_gtc">Post only flag is for GTC</string>
 </resources>

@@ -413,6 +413,42 @@ class OrderFragment : BaseFragment() {
                     override fun onStopTrackingTouch(seekBar: TickSeekBar?) {}
                 }
 
+                checkPostOnly.setOnCheckedChangeListener { _, isChecked ->
+                    if (isChecked && !checkedGTC.isChecked) {
+                        checkPostOnly.isChecked = false
+                        Toasty.error(
+                            requireContext(),
+                            requireContext().getString(R.string.post_only_flag_is_for_gtc),
+                            Toast.LENGTH_SHORT,
+                            true
+                        ).show()
+                    }
+                }
+
+                checkedFOK.setOnCheckedChangeListener { _, isChecked ->
+                    if (isChecked && checkPostOnly.isChecked) {
+                        checkPostOnly.isChecked = false
+                        Toasty.error(
+                            requireContext(),
+                            requireContext().getString(R.string.post_only_flag_is_for_gtc),
+                            Toast.LENGTH_SHORT,
+                            true
+                        ).show()
+                    }
+                }
+
+                checkedIOC.setOnCheckedChangeListener { _, isChecked ->
+                    if (isChecked && checkPostOnly.isChecked) {
+                        checkPostOnly.isChecked = false
+                        Toasty.error(
+                            requireContext(),
+                            requireContext().getString(R.string.post_only_flag_is_for_gtc),
+                            Toast.LENGTH_SHORT,
+                            true
+                        ).show()
+                    }
+                }
+
                 btnPlaceOrder.setOnClickListener {
                     if (checkedLimit.isChecked) {
                         if (edtLimitPrice.text!!.isNotEmpty() && edtQuantity.text!!.isNotEmpty()) {
