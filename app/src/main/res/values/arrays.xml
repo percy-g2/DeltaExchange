@@ -10,4 +10,15 @@
         <item>50x</item>
         <item>100x</item>
     </string-array>
+
+    <string-array name="resolution_range">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>2 hours</item>
+        <item>1 day</item>
+        <item>7 days</item>
+        <item>1 week</item>
+        <item>2 weeks</item>
+    </string-array>
 </resources>

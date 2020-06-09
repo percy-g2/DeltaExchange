@@ -41,8 +41,7 @@ class RecentTradesFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListene
                 swipeLayout.isRefreshing = false
             }
         })
-        val view = inflater.inflate(R.layout.fragment_recent_trades, container, false)
-        return view
+        return inflater.inflate(R.layout.fragment_recent_trades, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -69,8 +68,10 @@ class RecentTradesFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListene
         recentTradesViewModel.getOrderBook()!!.removeObservers(viewLifecycleOwner)
         chartProgressSpinner!!.visibility = View.VISIBLE
         recentTradesViewModel.getOrderBook()!!.observe(viewLifecycleOwner, Observer {
-            recentTradesList = it!!.recentTrades!!
-            list.adapter = RecentTradesAdapter(recentTradesList!!)
+            if (it != null) {
+                recentTradesList = it.recentTrades!!
+                list.adapter = RecentTradesAdapter(recentTradesList!!)
+            }
             chartProgressSpinner!!.visibility = View.GONE
             if (swipeLayout.isRefreshing) {
                 swipeLayout.isRefreshing = false

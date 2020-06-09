@@ -16,10 +16,10 @@ class ChartViewModel : ViewModel() {
             return
         }
         deltaRepository = DeltaRepository.getInstance(context)
-        mutableLiveData = deltaRepository!!.getChartHistory()
     }
 
-    fun getChartHistory(): LiveData<DeltaExchangeChartHistoryResponse?>? {
+    fun getChartHistory(resolution: String): LiveData<DeltaExchangeChartHistoryResponse?>? {
+        mutableLiveData = deltaRepository!!.getChartHistory(resolution)
         return mutableLiveData
     }
 }

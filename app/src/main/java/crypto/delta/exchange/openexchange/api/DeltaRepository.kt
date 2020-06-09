@@ -30,10 +30,10 @@ class DeltaRepository {
             .create(DeltaExchangeApiEndPoints::class.java)
     }
 
-    fun getChartHistory(): MutableLiveData<DeltaExchangeChartHistoryResponse?> {
+    fun getChartHistory(resolution: String): MutableLiveData<DeltaExchangeChartHistoryResponse?> {
         val data: MutableLiveData<DeltaExchangeChartHistoryResponse?> = MutableLiveData<DeltaExchangeChartHistoryResponse?>()
         val currentTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
-        deltaExchangeApiEndPoints!!.getChartHistory("BTCUSD", "30", "1590664611", currentTime.toString()).enqueue(object :
+        deltaExchangeApiEndPoints!!.getChartHistory("BTCUSD", resolution, "1105261585", currentTime.toString()).enqueue(object :
             Callback<DeltaExchangeChartHistoryResponse?> {
             override fun onResponse(
                 call: Call<DeltaExchangeChartHistoryResponse?>?,

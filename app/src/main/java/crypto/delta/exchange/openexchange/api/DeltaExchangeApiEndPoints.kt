@@ -54,4 +54,13 @@ interface DeltaExchangeApiEndPoints {
         @Header("signature") signature: String,
         @Body changeOrderLeverageBody: ChangeOrderLeverageBody
     ): Observable<OrderLeverageResponse>
+
+    @POST("orders")
+    fun getOrders(
+        @Header("api-key") apiKey: String,
+        @Header("timestamp") timestamp: String,
+        @Header("signature") signature: String,
+        @Query("product_id") productId: String,
+        @Query("state") state: String
+    ): Observable<CreateOrderResponse>
 }

@@ -10,40 +10,63 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/currentSymbol"
-            android:layout_width="wrap_content"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_margin="8dp"
-            android:text="BTCUSD"
-            android:textColor="@color/primaryTextColor"
-            android:textSize="25sp"
+            android:orientation="horizontal"
+            android:weightSum="2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/currentSymbol"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_margin="8dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="BTCUSD \u20BF"
+                android:textColor="@color/colorAccent"
+                android:textSize="25sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/resolutionSpinner"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_margin="8dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/primaryTextColor"
+                android:entries="@array/resolution_range"
+                android:gravity="center"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="25sp"
+                android:textStyle="bold" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
         <com.liihuu.klinechart.KLineChartView
             android:id="@+id/k_line_chart"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="?attr/actionBarSize"
             app:candle_style="solid"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/currentSymbol" />
-
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <ProgressBar
         android:id="@+id/chartProgressSpinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
         android:layout_gravity="center"
+        android:layout_margin="8dp"
         android:indeterminate="true" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
