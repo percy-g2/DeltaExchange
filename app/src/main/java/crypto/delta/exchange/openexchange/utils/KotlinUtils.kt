@@ -1,8 +1,6 @@
 package crypto.delta.exchange.openexchange.utils
 
-import android.R.id.message
 import android.content.Context
-import android.util.Base64
 import android.util.Log
 import android.util.TypedValue
 import android.widget.LinearLayout
@@ -11,7 +9,7 @@ import androidx.appcompat.app.AlertDialog
 import crypto.delta.exchange.openexchange.R
 import java.security.InvalidKeyException
 import java.security.NoSuchAlgorithmException
-import java.time.Instant
+import java.util.concurrent.TimeUnit
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
@@ -46,7 +44,7 @@ object KotlinUtils {
     }
 
     fun generateTimeStamp(): String {
-        return (Instant.now().epochSecond.minus(Instant.EPOCH.epochSecond)).toString()
+        return (TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())).toString()
     }
 
     fun showProgressBar(context: Context, dialogMsg: String): AlertDialog {
