@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import crypto.delta.exchange.openexchange.pojo.DeltaExchangeChartHistoryResponse
 import crypto.delta.exchange.openexchange.pojo.OrderBookResponse
+import crypto.delta.exchange.openexchange.pojo.products.ProductsResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -30,10 +31,10 @@ class DeltaRepository {
             .create(DeltaExchangeApiEndPoints::class.java)
     }
 
-    fun getChartHistory(resolution: String): MutableLiveData<DeltaExchangeChartHistoryResponse?> {
+    fun getChartHistory(resolution: String, symbol: String): MutableLiveData<DeltaExchangeChartHistoryResponse?> {
         val data: MutableLiveData<DeltaExchangeChartHistoryResponse?> = MutableLiveData<DeltaExchangeChartHistoryResponse?>()
         val currentTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
-        deltaExchangeApiEndPoints!!.getChartHistory("BTCUSD", resolution, "1105261585", currentTime.toString()).enqueue(object :
+        deltaExchangeApiEndPoints!!.getChartHistory(symbol, resolution, "1105261585", currentTime.toString()).enqueue(object :
             Callback<DeltaExchangeChartHistoryResponse?> {
             override fun onResponse(
                 call: Call<DeltaExchangeChartHistoryResponse?>?,
@@ -41,6 +42,8 @@ class DeltaRepository {
             ) {
                 if (response.isSuccessful) {
                     data.value = response.body()
+                } else {
+                    data.value = null
                 }
             }
 
@@ -51,23 +54,44 @@ class DeltaRepository {
         return data
     }
 
-    fun getOrderBook(): MutableLiveData<OrderBookResponse?> {
-        val newsData: MutableLiveData<OrderBookResponse?> = MutableLiveData<OrderBookResponse?>()
-        deltaExchangeApiEndPoints!!.getOrderBook("16").enqueue(object :
+    fun getOrderBook(productId: String): MutableLiveData<OrderBookResponse?> {
+        val data: MutableLiveData<OrderBookResponse?> = MutableLiveData<OrderBookResponse?>()
+        deltaExchangeApiEndPoints!!.getOrderBook(productId).enqueue(object :
             Callback<OrderBookResponse?> {
             override fun onResponse(
                 call: Call<OrderBookResponse?>?,
                 response: Response<OrderBookResponse?>
             ) {
                 if (response.isSuccessful) {
-                    newsData.value = response.body()
+                    data.value = response.body()
+                } else {
+                    data.value = null
                 }
             }
 
             override fun onFailure(call: Call<OrderBookResponse?>?, t: Throwable?) {
-                newsData.value = null
+                data.value = null
             }
         })
-        return newsData
+        return data
+    }
+
+    fun getProducts(): MutableLiveData<List<ProductsResponse>> {
+        val data: MutableLiveData<List<ProductsResponse>> = MutableLiveData<List<ProductsResponse>>()
+        deltaExchangeApiEndPoints!!.getProducts().enqueue(object :
+            Callback<List<ProductsResponse>> {
+            override fun onResponse(call: Call<List<ProductsResponse>>?, response: Response<List<ProductsResponse>>) {
+                if (response.isSuccessful) {
+                    data.value = response.body()
+                } else {
+                    data.value = null
+                }
+            }
+
+            override fun onFailure(call: Call<List<ProductsResponse>>?, t: Throwable?) {
+                data.value = null
+            }
+        })
+        return data
     }
 }

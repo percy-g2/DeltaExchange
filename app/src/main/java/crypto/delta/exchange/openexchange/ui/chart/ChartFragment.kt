@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.liihuu.klinechart.component.Candle
+import com.liihuu.klinechart.component.Indicator
 import com.liihuu.klinechart.model.KLineModel
 import crypto.delta.exchange.openexchange.R
 import crypto.delta.exchange.openexchange.pojo.ChartData
@@ -28,7 +29,7 @@ class ChartFragment : BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         chartViewModel = ViewModelProvider(this).get(ChartViewModel::class.java)
         chartViewModel.init(requireActivity())
-        chartViewModel.getChartHistory("15")!!.observe(viewLifecycleOwner, Observer {
+        chartViewModel.getChartHistory("15", appPreferenceManager!!.currentProductSymbol!!)!!.observe(viewLifecycleOwner, Observer {
             try {
                 if (it != null) {
                     val responseData = it
@@ -68,6 +69,7 @@ class ChartFragment : BaseFragment() {
                         klinedata.add(count, kLineModel)
                     }
                     k_line_chart.addData(klinedata)
+                    k_line_chart.setSubIndicatorType(Indicator.Type.NO)
                     requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                 }
             } catch (e: IOException) {
@@ -81,7 +83,7 @@ class ChartFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        currentSymbol.text = appPreferenceManager!!.currentProductSymbol!!
         resolutionSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -119,7 +121,7 @@ class ChartFragment : BaseFragment() {
 
                 chartViewModel = ViewModelProvider(requireActivity()).get(ChartViewModel::class.java)
                 chartViewModel.init(requireActivity())
-                chartViewModel.getChartHistory(resolution)!!.observe(viewLifecycleOwner, Observer {
+                chartViewModel.getChartHistory(resolution, appPreferenceManager!!.currentProductSymbol!!)!!.observe(viewLifecycleOwner, Observer {
                     try {
                         if (it != null) {
                             if (it.s.equals("ok")) {
@@ -161,7 +163,7 @@ class ChartFragment : BaseFragment() {
                                     klinedata.add(count, kLineModel)
                                 }
                                 k_line_chart.addData(klinedata)
-                             //   k_line_chart.setShowVolIndicatorChart(false)
+                                k_line_chart.setSubIndicatorType(Indicator.Type.NO)
                                 requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                             } else {
                                 Toasty.info(requireContext(), it.s!!, Toast.LENGTH_SHORT, true).show()

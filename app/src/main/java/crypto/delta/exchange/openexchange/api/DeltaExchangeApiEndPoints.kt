@@ -7,6 +7,7 @@ import crypto.delta.exchange.openexchange.pojo.order.ChangeOrderLeverageBody
 import crypto.delta.exchange.openexchange.pojo.order.CreateOrderRequest
 import crypto.delta.exchange.openexchange.pojo.order.CreateOrderResponse
 import crypto.delta.exchange.openexchange.pojo.order.OrderLeverageResponse
+import crypto.delta.exchange.openexchange.pojo.products.ProductsResponse
 import io.reactivex.Observable
 import retrofit2.Call
 import retrofit2.http.*
@@ -29,6 +30,9 @@ interface DeltaExchangeApiEndPoints {
     fun getOrderBook(
         @Path("product_id") product_id: String?
     ): Call<OrderBookResponse>
+
+    @GET("products")
+    fun getProducts(): Call<List<ProductsResponse>>
 
 
     @POST("orders")

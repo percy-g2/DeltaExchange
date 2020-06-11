@@ -75,7 +75,7 @@ class OrderBookFragment: BaseFragment() {
 
                         val channel2 = Channel()
                         channel2.name = "l2_orderbook"
-                        channel2.symbols = arrayListOf("BTCUSD")
+                        channel2.symbols = arrayListOf(appPreferenceManager!!.currentProductSymbol!!)
 
                         val payload = Payload()
                         payload.channels = arrayListOf(channel2)
@@ -124,22 +124,34 @@ class OrderBookFragment: BaseFragment() {
                     CoroutineScope(Dispatchers.Main).launch {
                         withContext(Dispatchers.Main) {
                             if (!it.toString().contains("subscription".toRegex())) {
-                                val data = it.toString().replace("size", "d_size")
-                                val gson = Gson()
-                                val response =
-                                    gson.fromJson(
-                                        data,
-                                        DeltaExchangeL2OrderBookResponse::class.java
-                                    )
-                                response.buy = response.buy!!.slice(IntRange(1, 10)).sortedBy {
-                                    it.d_size
-                                }
-                                response.sell = response.sell!!.slice(IntRange(1, 10)).sortedBy {
-                                    it.d_size
-                                }
-                                orderBookAdapter!!.updateOrderBook(response)
-                                if (layoutManager!!.findFirstVisibleItemPosition() == 0) {
-                                    layoutManager!!.scrollToPositionWithOffset(0, 0)
+                                if (null != it) {
+                                    val data = it.toString().replace("size", "d_size")
+                                    val gson = Gson()
+                                    val response =
+                                        gson.fromJson(
+                                            data,
+                                            DeltaExchangeL2OrderBookResponse::class.java
+                                        )
+                                    /*Log.d(
+                                        OrderFragment::class.java.simpleName,
+                                        "response $data"
+                                    )*/
+                                    if (response.buy!!.size > 10) {
+                                        response.buy =
+                                            response.buy!!.slice(IntRange(1, 10)).sortedBy {
+                                                it.d_size
+                                            }
+                                    }
+                                    if (response.sell!!.size > 10) {
+                                        response.sell =
+                                            response.sell!!.slice(IntRange(1, 10)).sortedBy {
+                                                it.d_size
+                                            }
+                                    }
+                                    orderBookAdapter!!.updateOrderBook(response)
+                                    if (layoutManager!!.findFirstVisibleItemPosition() == 0) {
+                                        layoutManager!!.scrollToPositionWithOffset(0, 0)
+                                    }
                                 }
                             }
                         }

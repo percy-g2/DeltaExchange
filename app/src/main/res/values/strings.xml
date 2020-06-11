@@ -51,4 +51,15 @@
     <string name="quantity_is_zero">Quantity can\'t be zero</string>
     <string name="configure_api_key_first">Configure API key first</string>
     <string name="post_only_flag_is_for_gtc">Post only flag is for GTC</string>
+    <string name="title_home">Home</string>
+    <string name="current_product_id_preference">current_product_id_preference</string>
+    <string name="current_product_symbol_preference">current_product_symbol_preference</string>
+    <string name="crypto">Crypto</string>
+    <string name="derivatives">Derivatives</string>
+    <string name="exchange">Exchange</string>
+    <string name="futures">Futures</string>
+    <string name="move">Move</string>
+    <string name="interest_rate_swipes">Interest Rate Swipes</string>
+    <string name="btc_settled">BTC Settled</string>
+    <string name="usdt_settled">USDT Settled</string>
 </resources>

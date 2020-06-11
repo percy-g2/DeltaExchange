@@ -54,7 +54,7 @@ import java.net.SocketTimeoutException
 class OrderFragment : BaseFragment() {
 
     private val logTag: String? = OrderFragment::class.java.simpleName
-    private lateinit var homeViewModel: OrderViewModel
+    private lateinit var orderViewModel: OrderViewModel
     private val disposables: CompositeDisposable = CompositeDisposable()
 
     override fun onCreateView(
@@ -63,7 +63,7 @@ class OrderFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_order, container, false)
-        homeViewModel = ViewModelProvider(this).get(OrderViewModel::class.java)
+        orderViewModel = ViewModelProvider(this).get(OrderViewModel::class.java)
         return view
     }
 
@@ -145,7 +145,7 @@ class OrderFragment : BaseFragment() {
                 val timeStamp = KotlinUtils.generateTimeStamp()
                 val method = "GET"
                 val path = "/orders/leverage"
-                val queryString = "?product_id=16"
+                val queryString = "?product_id="+ appPreferenceManager!!.currentProductId!!
                 val payload = ""
                 val signatureData = method + timeStamp + path + queryString + payload
                 Log.d(logTag, signatureData)
@@ -162,7 +162,7 @@ class OrderFragment : BaseFragment() {
                     appPreferenceManager!!.apiKey!!,
                     timeStamp,
                     signature!!,
-                    "16"
+                    appPreferenceManager!!.currentProductId!!
                 )
                 observe.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -303,7 +303,7 @@ class OrderFragment : BaseFragment() {
 
                         if (leverageChangedByUser) {
                             val changeOrderLeverageBody = ChangeOrderLeverageBody()
-                            changeOrderLeverageBody.productId = 16
+                            changeOrderLeverageBody.productId = appPreferenceManager!!.currentProductId!!.toInt()
                             when (seekParams.progress) {
                                 0 -> {
                                     changeOrderLeverageBody.leverage = "1.0"
@@ -464,7 +464,7 @@ class OrderFragment : BaseFragment() {
                                 } else {
                                     createOrderRequest.side = CreateOrderRequest.Side.buy
                                 }
-                                createOrderRequest.productId = 16
+                                createOrderRequest.productId = appPreferenceManager!!.currentProductId!!.toInt()
                                 createOrderRequest.limitPrice = edtLimitPrice.text.toString()
                                 createOrderRequest.size = edtQuantity.text.toString().toInt()
                                 when {
@@ -541,7 +541,7 @@ class OrderFragment : BaseFragment() {
                                 } else {
                                     createOrderRequest.side = CreateOrderRequest.Side.buy
                                 }
-                                createOrderRequest.productId = 16
+                                createOrderRequest.productId = appPreferenceManager!!.currentProductId!!.toInt()
                                 createOrderRequest.size = edtQuantity.text.toString().toInt()
                                 if (checkReduceOnly.isChecked) {
                                     createOrderRequest.reduceOnly = "true"

@@ -31,7 +31,7 @@ class RecentTradesFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListene
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         recentTradesViewModel = ViewModelProvider(this).get(RecentTradesViewModel::class.java)
         recentTradesViewModel.init(requireActivity())
-        recentTradesViewModel.getOrderBook()!!.observe(viewLifecycleOwner, Observer {
+        recentTradesViewModel.getOrderBook(appPreferenceManager!!.currentProductId!!)!!.observe(viewLifecycleOwner, Observer {
             if (it != null) {
                 recentTradesList = it.recentTrades!!
                 list.adapter = RecentTradesAdapter(recentTradesList!!)
@@ -65,9 +65,9 @@ class RecentTradesFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListene
         recentTradesViewModel = ViewModelProvider(this).get(RecentTradesViewModel::class.java)
         recentTradesViewModel.init(requireActivity())
         recentTradesList!!.clear()
-        recentTradesViewModel.getOrderBook()!!.removeObservers(viewLifecycleOwner)
+        recentTradesViewModel.getOrderBook(appPreferenceManager!!.currentProductId!!)!!.removeObservers(viewLifecycleOwner)
         chartProgressSpinner!!.visibility = View.VISIBLE
-        recentTradesViewModel.getOrderBook()!!.observe(viewLifecycleOwner, Observer {
+        recentTradesViewModel.getOrderBook(appPreferenceManager!!.currentProductId!!)!!.observe(viewLifecycleOwner, Observer {
             if (it != null) {
                 recentTradesList = it.recentTrades!!
                 list.adapter = RecentTradesAdapter(recentTradesList!!)

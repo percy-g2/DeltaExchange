@@ -28,12 +28,12 @@ class OrderBookAdapter(private var orderBookList: DeltaExchangeL2OrderBookRespon
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val buy = orderBookList.buy?.get(position)
-        val ask = orderBookList.sell?.get(position)
+        val buy = orderBookList.buy!![position]
+        val ask = orderBookList.sell!![position]
 
-        holder.sizeBid.text = buy!!.d_size.toString()
+        holder.sizeBid.text = buy.d_size.toString()
         holder.priceBid.text = buy.limitPrice.toString()
-        holder.sizeAsk.text = ask!!.d_size.toString()
+        holder.sizeAsk.text = ask.d_size.toString()
         holder.priceAsk.text = ask.limitPrice.toString()
     }
 

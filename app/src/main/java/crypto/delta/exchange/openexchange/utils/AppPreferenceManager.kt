@@ -25,6 +25,20 @@ class AppPreferenceManager(private val context: Context) {
         prefs.edit().putString(context.resources.getString(R.string.api_secret_preference), value!!).apply()
     }
 
+    val currentProductId: String?
+        get() = prefs.getString(context.resources.getString(R.string.current_product_id_preference), "27")
+
+    fun setCurrentProductId(value: String?) {
+        prefs.edit().putString(context.resources.getString(R.string.current_product_id_preference), value!!).apply()
+    }
+
+    val currentProductSymbol: String?
+        get() = prefs.getString(context.resources.getString(R.string.current_product_symbol_preference), "BTCUSD")
+
+    fun setCurrentProductSymbol(value: String?) {
+        prefs.edit().putString(context.resources.getString(R.string.current_product_symbol_preference), value!!).apply()
+    }
+
     private fun getEncryptedSharedPreferences(): SharedPreferences? {
         val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
         return EncryptedSharedPreferences.create(
