@@ -3,12 +3,18 @@ package crypto.delta.exchange.openexchange.api
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import crypto.delta.exchange.openexchange.pojo.DeltaExchangeChartHistoryResponse
+import crypto.delta.exchange.openexchange.pojo.DeltaExchangeTickerResponse
 import crypto.delta.exchange.openexchange.pojo.OrderBookResponse
 import crypto.delta.exchange.openexchange.pojo.products.ProductsResponse
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.observers.DisposableObserver
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.schedulers.Schedulers
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.concurrent.TimeUnit
+
 
 class DeltaRepository {
     companion object {
@@ -31,10 +37,9 @@ class DeltaRepository {
             .create(DeltaExchangeApiEndPoints::class.java)
     }
 
-    fun getChartHistory(resolution: String, symbol: String): MutableLiveData<DeltaExchangeChartHistoryResponse?> {
+    fun getChartHistory(resolution: String, symbol: String, strFrom: String, strTo: String): MutableLiveData<DeltaExchangeChartHistoryResponse?> {
         val data: MutableLiveData<DeltaExchangeChartHistoryResponse?> = MutableLiveData<DeltaExchangeChartHistoryResponse?>()
-        val currentTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
-        deltaExchangeApiEndPoints!!.getChartHistory(symbol, resolution, "1105261585", currentTime.toString()).enqueue(object :
+        deltaExchangeApiEndPoints!!.getChartHistory(symbol, resolution, strFrom, strTo).enqueue(object :
             Callback<DeltaExchangeChartHistoryResponse?> {
             override fun onResponse(
                 call: Call<DeltaExchangeChartHistoryResponse?>?,
@@ -76,22 +81,48 @@ class DeltaRepository {
         return data
     }
 
-    fun getProducts(): MutableLiveData<List<ProductsResponse>> {
+    fun getProducts(disposables: CompositeDisposable): MutableLiveData<List<ProductsResponse>> {
         val data: MutableLiveData<List<ProductsResponse>> = MutableLiveData<List<ProductsResponse>>()
-        deltaExchangeApiEndPoints!!.getProducts().enqueue(object :
-            Callback<List<ProductsResponse>> {
-            override fun onResponse(call: Call<List<ProductsResponse>>?, response: Response<List<ProductsResponse>>) {
-                if (response.isSuccessful) {
-                    data.value = response.body()
-                } else {
+        deltaExchangeApiEndPoints!!.getProducts()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : DisposableObserver<List<ProductsResponse>>() {
+                override fun onComplete() {
+                }
+
+                override fun onNext(response: List<ProductsResponse>) {
+                    data.value = response
+                }
+
+                override fun onError(e: Throwable) {
+                    e.printStackTrace()
                     data.value = null
                 }
-            }
 
-            override fun onFailure(call: Call<List<ProductsResponse>>?, t: Throwable?) {
-                data.value = null
-            }
-        })
+            }).addTo(disposables)
+        return data
+    }
+
+    fun getProductsData(symbol: String): MutableLiveData<DeltaExchangeTickerResponse>? {
+        val data: MutableLiveData<DeltaExchangeTickerResponse> = MutableLiveData<DeltaExchangeTickerResponse>()
+        deltaExchangeApiEndPoints!!.getTickers24Hrs(symbol)
+            .enqueue(object :
+                Callback<DeltaExchangeTickerResponse?> {
+                override fun onResponse(
+                    call: Call<DeltaExchangeTickerResponse?>?,
+                    response: Response<DeltaExchangeTickerResponse?>
+                ) {
+                    if (response.isSuccessful) {
+                        data.value = response.body()
+                    } else {
+                        data.value = null
+                    }
+                }
+
+                override fun onFailure(call: Call<DeltaExchangeTickerResponse?>?, t: Throwable?) {
+                    data.value = null
+                }
+            })
         return data
     }
 }

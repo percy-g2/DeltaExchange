@@ -29,7 +29,8 @@ class ChartFragment : BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         chartViewModel = ViewModelProvider(this).get(ChartViewModel::class.java)
         chartViewModel.init(requireActivity())
-        chartViewModel.getChartHistory("15", appPreferenceManager!!.currentProductSymbol!!)!!.observe(viewLifecycleOwner, Observer {
+        val currentTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
+        chartViewModel.getChartHistory("15", appPreferenceManager!!.currentProductSymbol!!, "1105261585", currentTime.toString())!!.observe(viewLifecycleOwner, Observer {
             try {
                 if (it != null) {
                     val responseData = it
@@ -121,7 +122,8 @@ class ChartFragment : BaseFragment() {
 
                 chartViewModel = ViewModelProvider(requireActivity()).get(ChartViewModel::class.java)
                 chartViewModel.init(requireActivity())
-                chartViewModel.getChartHistory(resolution, appPreferenceManager!!.currentProductSymbol!!)!!.observe(viewLifecycleOwner, Observer {
+                val currentTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
+                chartViewModel.getChartHistory(resolution, appPreferenceManager!!.currentProductSymbol!!, "1105261585", currentTime.toString())!!.observe(viewLifecycleOwner, Observer {
                     try {
                         if (it != null) {
                             if (it.s.equals("ok")) {

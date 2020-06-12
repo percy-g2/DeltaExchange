@@ -32,7 +32,7 @@ interface DeltaExchangeApiEndPoints {
     ): Call<OrderBookResponse>
 
     @GET("products")
-    fun getProducts(): Call<List<ProductsResponse>>
+    fun getProducts(): Observable<List<ProductsResponse>>
 
 
     @POST("orders")

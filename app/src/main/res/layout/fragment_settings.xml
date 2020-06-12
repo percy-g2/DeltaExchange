@@ -1,17 +1,17 @@
 <androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:background="@color/backgroundColor"
     android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
     android:orientation="vertical">
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:layout_marginStart="5dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="5dp"
-        android:layout_gravity="center"
         android:layout_marginBottom="5dp"
         android:backgroundTint="@color/colorPrimaryDusk"
         android:minHeight="?android:attr/listPreferredItemHeight"
@@ -21,8 +21,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:padding="10dp"
             android:gravity="center"
+            android:padding="10dp"
             android:text="API Details"
             android:textColor="@color/primaryTextColor" />
 
@@ -33,17 +33,17 @@
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="2"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:weightSum="2">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/ApiKeyTextInputLayout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
             android:layout_gravity="center"
             android:layout_margin="5dp"
+            android:layout_weight="1"
             android:gravity="center"
             android:hint="@string/api_key"
             android:textColorHint="@color/primaryTextColor"
@@ -67,9 +67,9 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
             android:layout_gravity="center"
             android:layout_margin="5dp"
+            android:layout_weight="1"
             android:gravity="center"
             android:hint="@string/api_secret"
             android:textColorHint="@color/primaryTextColor"
@@ -88,4 +88,14 @@
         </com.google.android.material.textfield.TextInputLayout>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/useTestNetServer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="Test Net Server"
+        android:checked="true"
+        android:textColor="@color/primaryTextColor" />
+
 </androidx.appcompat.widget.LinearLayoutCompat>

@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 class ConstituentExchange {
     @SerializedName("weight")
     @Expose
-    var weight: Int? = null
+    var weight: Double? = null
 
     @SerializedName("exchange")
     @Expose

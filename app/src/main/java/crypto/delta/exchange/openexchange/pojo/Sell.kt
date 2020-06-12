@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName
 class Sell {
     @SerializedName("limit_price")
     @Expose
-    var limitPrice: Double? = null
+    var limitPrice: Float? = null
 
     @SerializedName("d_size")
     @Expose

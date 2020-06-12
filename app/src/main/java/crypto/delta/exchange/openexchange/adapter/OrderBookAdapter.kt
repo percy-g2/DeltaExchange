@@ -32,9 +32,9 @@ class OrderBookAdapter(private var orderBookList: DeltaExchangeL2OrderBookRespon
         val ask = orderBookList.sell!![position]
 
         holder.sizeBid.text = buy.d_size.toString()
-        holder.priceBid.text = buy.limitPrice.toString()
+        holder.priceBid.text = buy.limitPrice?.toBigDecimal()?.toPlainString()
         holder.sizeAsk.text = ask.d_size.toString()
-        holder.priceAsk.text = ask.limitPrice.toString()
+        holder.priceAsk.text = ask.limitPrice?.toBigDecimal()?.toPlainString()
     }
 
     fun updateOrderBook(orderBook: DeltaExchangeL2OrderBookResponse) {

@@ -18,6 +18,13 @@ class AppPreferenceManager(private val context: Context) {
         prefs.edit().putString(context.resources.getString(R.string.api_key_preference), value!!).apply()
     }
 
+    val useTestNetServer: Boolean?
+        get() = prefs.getBoolean(context.resources.getString(R.string.test_net_server_preference), true)
+
+    fun setUseTestNetServer(value: Boolean?) {
+        prefs.edit().putBoolean(context.resources.getString(R.string.test_net_server_preference), value!!).apply()
+    }
+
     val apiSecret: String?
         get() = prefs.getString(context.resources.getString(R.string.api_secret_preference), "")
 

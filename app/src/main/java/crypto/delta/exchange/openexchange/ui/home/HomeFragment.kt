@@ -30,6 +30,7 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
     ): View? {
         homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
         homeViewModel.init(requireActivity())
+
         homeViewModel.getProducts()!!.observe(viewLifecycleOwner, Observer { list ->
             if (null != list) {
                 productsResponseList = list
@@ -42,6 +43,7 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                     },
                     requireActivity()
                 )
+                progressSpinner.visibility = View.GONE
             }
         })
         return inflater.inflate(R.layout.fragment_home, container, false)
@@ -144,7 +146,7 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                             )
                         }
                     }
-                    tab.text.toString() == resources.getString(R.string.interest_rate_swipes) -> {
+                    tab.text.toString() == resources.getString(R.string.interest_rate_swaps) -> {
                         futuresSettled.visibility = View.GONE
                         if (null != productsResponseList) {
                             filteredProductsResponseList = productsResponseList
@@ -200,7 +202,7 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                             )
                         }
                     }
-                    tab.text.toString() == resources.getString(R.string.interest_rate_swipes) -> {
+                    tab.text.toString() == resources.getString(R.string.interest_rate_swaps) -> {
                         futuresSettled.visibility = View.GONE
                         if (null != productsResponseList) {
                             filteredProductsResponseList = productsResponseList
@@ -272,7 +274,7 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                         }
                     }
                     productType.getTabAt(productType.selectedTabPosition)!!.text.toString() == resources.getString(
-                        R.string.interest_rate_swipes
+                        R.string.interest_rate_swaps
                     ) -> {
                         if (null != productsResponseList) {
                             homeRecyclerView.adapter = HomeAdapter(

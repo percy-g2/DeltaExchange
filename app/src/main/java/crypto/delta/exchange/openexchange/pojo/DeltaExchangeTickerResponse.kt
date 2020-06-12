@@ -22,19 +22,19 @@ class DeltaExchangeTickerResponse {
 
     @SerializedName("open")
     @Expose
-    var open: Double? = null
+    var open: Float? = null
 
     @SerializedName("high")
     @Expose
-    var high: Double? = null
+    var high: Float? = null
 
     @SerializedName("low")
     @Expose
-    var low: Double? = null
+    var low: Float? = null
 
     @SerializedName("close")
     @Expose
-    var close: Double? = null
+    var close: Float? = null
 
     @SerializedName("volume")
     @Expose

@@ -6,6 +6,7 @@ import android.util.TypedValue
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
+import androidx.navigation.NavOptions
 import crypto.delta.exchange.openexchange.R
 import java.security.InvalidKeyException
 import java.security.NoSuchAlgorithmException
@@ -81,5 +82,14 @@ object KotlinUtils {
         val size = a.getDimensionPixelSize(0, -1)
         a.recycle()
         return size
+    }
+
+    fun getNavOptions(): NavOptions? {
+        return NavOptions.Builder()
+            .setEnterAnim(android.R.anim.slide_in_left)
+            .setExitAnim(android.R.anim.slide_out_right)
+            .setPopEnterAnim(android.R.anim.fade_in)
+            .setPopExitAnim(android.R.anim.fade_out)
+            .build()
     }
 }

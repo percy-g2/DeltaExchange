@@ -30,17 +30,6 @@ class RecentTradesFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListene
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         recentTradesViewModel = ViewModelProvider(this).get(RecentTradesViewModel::class.java)
-        recentTradesViewModel.init(requireActivity())
-        recentTradesViewModel.getOrderBook(appPreferenceManager!!.currentProductId!!)!!.observe(viewLifecycleOwner, Observer {
-            if (it != null) {
-                recentTradesList = it.recentTrades!!
-                list.adapter = RecentTradesAdapter(recentTradesList!!)
-            }
-            chartProgressSpinner!!.visibility = View.GONE
-            if (swipeLayout.isRefreshing) {
-                swipeLayout.isRefreshing = false
-            }
-        })
         return inflater.inflate(R.layout.fragment_recent_trades, container, false)
     }
 
@@ -55,6 +44,17 @@ class RecentTradesFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListene
             )
         )
         swipeLayout.setOnRefreshListener(this)
+        recentTradesViewModel.init(requireActivity())
+        recentTradesViewModel.getOrderBook(appPreferenceManager!!.currentProductId!!)!!.observe(viewLifecycleOwner, Observer {
+            if (it != null) {
+                recentTradesList = it.recentTrades!!
+                list.adapter = RecentTradesAdapter(recentTradesList!!)
+            }
+            chartProgressSpinner!!.visibility = View.GONE
+            if (swipeLayout.isRefreshing) {
+                swipeLayout.isRefreshing = false
+            }
+        })
     }
 
     override fun onRefresh() {

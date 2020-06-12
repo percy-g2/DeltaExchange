@@ -3,6 +3,7 @@ package crypto.delta.exchange.openexchange.api
 import android.content.Context
 import com.google.gson.GsonBuilder
 import crypto.delta.exchange.openexchange.BuildConfig
+import crypto.delta.exchange.openexchange.utils.AppPreferenceManager
 import crypto.delta.exchange.openexchange.utils.Native
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -39,8 +40,13 @@ class DeltaApiClient {
             httpClient.connectTimeout(400, TimeUnit.SECONDS)
             httpClient.followRedirects(true)
             httpClient.retryOnConnectionFailure(true)
+            val baseUrl = if (AppPreferenceManager(mContext).useTestNetServer!!) {
+                Native.deltaExchangeTestNetBaseUrl
+            } else {
+                Native.deltaExchangeBaseUrl
+            }
             retrofit = Retrofit.Builder()
-                .baseUrl(Native.deltaExchangeBaseUrl)
+                .baseUrl(baseUrl)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(httpClient.build())

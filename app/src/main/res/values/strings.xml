@@ -59,7 +59,9 @@
     <string name="exchange">Exchange</string>
     <string name="futures">Futures</string>
     <string name="move">Move</string>
-    <string name="interest_rate_swipes">Interest Rate Swipes</string>
+    <string name="interest_rate_swaps">Interest Rate Swaps</string>
     <string name="btc_settled">BTC Settled</string>
     <string name="usdt_settled">USDT Settled</string>
+    <string name="test_net_server_preference">test_net_server_preference</string>
+    <string name="please_wait_restarting">Please wait restarting</string>
 </resources>
