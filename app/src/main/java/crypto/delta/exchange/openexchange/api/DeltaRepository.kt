@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import crypto.delta.exchange.openexchange.pojo.DeltaExchangeChartHistoryResponse
 import crypto.delta.exchange.openexchange.pojo.DeltaExchangeTickerResponse
 import crypto.delta.exchange.openexchange.pojo.OrderBookResponse
+import crypto.delta.exchange.openexchange.pojo.order.CreateOrderResponse
 import crypto.delta.exchange.openexchange.pojo.products.ProductsResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -37,13 +38,45 @@ class DeltaRepository {
             .create(DeltaExchangeApiEndPoints::class.java)
     }
 
-    fun getChartHistory(resolution: String, symbol: String, strFrom: String, strTo: String): MutableLiveData<DeltaExchangeChartHistoryResponse?> {
-        val data: MutableLiveData<DeltaExchangeChartHistoryResponse?> = MutableLiveData<DeltaExchangeChartHistoryResponse?>()
-        deltaExchangeApiEndPoints!!.getChartHistory(symbol, resolution, strFrom, strTo).enqueue(object :
-            Callback<DeltaExchangeChartHistoryResponse?> {
+    fun getChartHistory(
+        resolution: String,
+        symbol: String,
+        strFrom: String,
+        strTo: String
+    ): MutableLiveData<DeltaExchangeChartHistoryResponse?> {
+        val data: MutableLiveData<DeltaExchangeChartHistoryResponse?> =
+            MutableLiveData<DeltaExchangeChartHistoryResponse?>()
+        deltaExchangeApiEndPoints!!.getChartHistory(symbol, resolution, strFrom, strTo)
+            .enqueue(object :
+                Callback<DeltaExchangeChartHistoryResponse?> {
+                override fun onResponse(
+                    call: Call<DeltaExchangeChartHistoryResponse?>?,
+                    response: Response<DeltaExchangeChartHistoryResponse?>
+                ) {
+                    if (response.isSuccessful) {
+                        data.value = response.body()
+                    } else {
+                        data.value = null
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<DeltaExchangeChartHistoryResponse?>?,
+                    t: Throwable?
+                ) {
+                    data.value = null
+                }
+            })
+        return data
+    }
+
+    fun getOrders(apiKey: String, timestamp: String, signature: String, productId: String, state: String): MutableLiveData<List<CreateOrderResponse>?> {
+        val data: MutableLiveData<List<CreateOrderResponse>?> = MutableLiveData<List<CreateOrderResponse>?>()
+        deltaExchangeApiEndPoints!!.getOrders(apiKey, timestamp, signature, state).enqueue(object :
+            Callback<List<CreateOrderResponse>?> {
             override fun onResponse(
-                call: Call<DeltaExchangeChartHistoryResponse?>?,
-                response: Response<DeltaExchangeChartHistoryResponse?>
+                call: Call<List<CreateOrderResponse>?>?,
+                response: Response<List<CreateOrderResponse>?>
             ) {
                 if (response.isSuccessful) {
                     data.value = response.body()
@@ -52,7 +85,7 @@ class DeltaRepository {
                 }
             }
 
-            override fun onFailure(call: Call<DeltaExchangeChartHistoryResponse?>?, t: Throwable?) {
+            override fun onFailure(call: Call<List<CreateOrderResponse>?>?, t: Throwable?) {
                 data.value = null
             }
         })
@@ -82,7 +115,8 @@ class DeltaRepository {
     }
 
     fun getProducts(disposables: CompositeDisposable): MutableLiveData<List<ProductsResponse>> {
-        val data: MutableLiveData<List<ProductsResponse>> = MutableLiveData<List<ProductsResponse>>()
+        val data: MutableLiveData<List<ProductsResponse>> =
+            MutableLiveData<List<ProductsResponse>>()
         deltaExchangeApiEndPoints!!.getProducts()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -104,7 +138,8 @@ class DeltaRepository {
     }
 
     fun getProductsData(symbol: String): MutableLiveData<DeltaExchangeTickerResponse>? {
-        val data: MutableLiveData<DeltaExchangeTickerResponse> = MutableLiveData<DeltaExchangeTickerResponse>()
+        val data: MutableLiveData<DeltaExchangeTickerResponse> =
+            MutableLiveData<DeltaExchangeTickerResponse>()
         deltaExchangeApiEndPoints!!.getTickers24Hrs(symbol)
             .enqueue(object :
                 Callback<DeltaExchangeTickerResponse?> {

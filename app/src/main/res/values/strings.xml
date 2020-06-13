@@ -64,4 +64,10 @@
     <string name="usdt_settled">USDT Settled</string>
     <string name="test_net_server_preference">test_net_server_preference</string>
     <string name="please_wait_restarting">Please wait restarting</string>
+    <string name="position">Position</string>
+    <string name="open_orders">Open Orders</string>
+    <string name="contract">Contract</string>
+    <string name="filled_left">Filled/Left</string>
+    <string name="value">Value</string>
+    <string name="type">Type</string>
 </resources>

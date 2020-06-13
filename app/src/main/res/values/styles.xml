@@ -57,7 +57,7 @@
         <item name="android:ellipsize">end</item>
     </style>
 
-    <style name="AlertDialogStyle" parent="Theme.MaterialComponents.DayNight.Dialog">
+    <style name="AlertDialogStyle" parent="Theme.MaterialComponents.Dialog">
         <item name="android:textColor">@color/primaryTextColor</item>
         <item name="android:textColorPrimary">@color/primaryTextColor</item>
     </style>

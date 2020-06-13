@@ -11,10 +11,10 @@
       "type": "SINGLE",
       "filters": [],
       "properties": [],
-      "versionCode": 1,
-      "versionName": "1",
+      "versionCode": 2,
+      "versionName": "2",
       "enabled": true,
-      "outputFile": "DeltaExchange-alpha-1.0-release.apk"
+      "outputFile": "DeltaExchange-alpha-1.1-release.apk"
     }
   ]
 }

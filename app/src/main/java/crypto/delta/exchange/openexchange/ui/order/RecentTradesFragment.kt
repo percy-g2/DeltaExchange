@@ -76,7 +76,6 @@ class RecentTradesFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListene
             if (swipeLayout.isRefreshing) {
                 swipeLayout.isRefreshing = false
             }
-
         })
     }
 }

@@ -35,7 +35,7 @@ interface DeltaExchangeApiEndPoints {
     fun getProducts(): Observable<List<ProductsResponse>>
 
 
-    @POST("orders")
+    @POST("/orders")
     fun createOrder(
         @Header("api-key") apiKey: String,
         @Header("timestamp") timestamp: String,
@@ -59,12 +59,11 @@ interface DeltaExchangeApiEndPoints {
         @Body changeOrderLeverageBody: ChangeOrderLeverageBody
     ): Observable<OrderLeverageResponse>
 
-    @POST("orders")
+    @GET("/orders")
     fun getOrders(
         @Header("api-key") apiKey: String,
         @Header("timestamp") timestamp: String,
         @Header("signature") signature: String,
-        @Query("product_id") productId: String,
         @Query("state") state: String
-    ): Observable<CreateOrderResponse>
+    ): Call<List<CreateOrderResponse>>
 }
