@@ -13,23 +13,16 @@ import crypto.delta.exchange.openexchange.R
 import crypto.delta.exchange.openexchange.adapter.RecentTradesAdapter
 import crypto.delta.exchange.openexchange.pojo.RecentTrade
 import crypto.delta.exchange.openexchange.ui.base.BaseFragment
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_recent_trades.*
 
 class RecentTradesFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private lateinit var recentTradesViewModel: RecentTradesViewModel
-
-    override fun onDetach() {
-        super.onDetach()
-        disposables.clear()
-    }
-
-    private val disposables: CompositeDisposable = CompositeDisposable()
     private var recentTradesList: ArrayList<RecentTrade>? = ArrayList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         recentTradesViewModel = ViewModelProvider(this).get(RecentTradesViewModel::class.java)
+        recentTradesViewModel.init(requireContext())
         return inflater.inflate(R.layout.fragment_recent_trades, container, false)
     }
 
@@ -44,7 +37,7 @@ class RecentTradesFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListene
             )
         )
         swipeLayout.setOnRefreshListener(this)
-        recentTradesViewModel.init(requireActivity())
+
         recentTradesViewModel.getOrderBook(appPreferenceManager!!.currentProductId!!)!!.observe(viewLifecycleOwner, Observer {
             if (it != null) {
                 recentTradesList = it.recentTrades!!
@@ -62,8 +55,6 @@ class RecentTradesFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListene
     }
 
     private fun loadRecyclerViewData() {
-        recentTradesViewModel = ViewModelProvider(this).get(RecentTradesViewModel::class.java)
-        recentTradesViewModel.init(requireActivity())
         recentTradesList!!.clear()
         recentTradesViewModel.getOrderBook(appPreferenceManager!!.currentProductId!!)!!.removeObservers(viewLifecycleOwner)
         chartProgressSpinner!!.visibility = View.VISIBLE

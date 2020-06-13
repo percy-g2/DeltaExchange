@@ -14,16 +14,14 @@ import crypto.delta.exchange.openexchange.adapter.OpenOrdersAdapter
 import crypto.delta.exchange.openexchange.ui.base.BaseFragment
 import crypto.delta.exchange.openexchange.utils.KotlinUtils
 import kotlinx.android.synthetic.main.fragment_open_orders.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class OpenOrdersFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
     private lateinit var openOrdersViewModel: OpenOrdersViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
+        openOrdersViewModel =
+            ViewModelProvider(this@OpenOrdersFragment).get(OpenOrdersViewModel::class.java)
+        openOrdersViewModel.init(requireActivity())
         return inflater.inflate(R.layout.fragment_open_orders, container, false)
     }
 
@@ -37,11 +35,7 @@ class OpenOrdersFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener 
                 DividerItemDecoration.VERTICAL
             )
         )
-        CoroutineScope(Dispatchers.Main).launch {
-            delay(500)
-            openOrdersViewModel = ViewModelProvider(this@OpenOrdersFragment).get(OpenOrdersViewModel::class.java)
-            loadOrders()
-        }
+        loadOrders()
         swipeLayout.setOnRefreshListener(this)
     }
 
@@ -64,7 +58,7 @@ class OpenOrdersFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener 
             signatureData,
             appPreferenceManager!!.apiSecret!!
         )
-        openOrdersViewModel.init(requireActivity())
+
         openOrdersViewModel.getOrders(appPreferenceManager!!.apiKey!!,
             timeStamp,
             signature!!,

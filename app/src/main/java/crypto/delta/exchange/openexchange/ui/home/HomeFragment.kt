@@ -28,8 +28,22 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
-        homeViewModel.init(requireActivity())
+        homeViewModel = ViewModelProvider(this@HomeFragment).get(HomeViewModel::class.java)
+        homeViewModel.init(requireContext())
+        return inflater.inflate(R.layout.fragment_home, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        homeRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        homeRecyclerView.itemAnimator = null
+        homeRecyclerView.addItemDecoration(
+            DividerItemDecoration(
+                requireContext(),
+                DividerItemDecoration.VERTICAL
+            )
+        )
+        swipeLayout.setOnRefreshListener(this)
 
         homeViewModel.getProducts()!!.observe(viewLifecycleOwner, Observer { list ->
             if (null != list) {
@@ -46,20 +60,7 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                 progressSpinner.visibility = View.GONE
             }
         })
-        return inflater.inflate(R.layout.fragment_home, container, false)
-    }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        homeRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        homeRecyclerView.itemAnimator = null
-        homeRecyclerView.addItemDecoration(
-            DividerItemDecoration(
-                requireContext(),
-                DividerItemDecoration.VERTICAL
-            )
-        )
-        swipeLayout.setOnRefreshListener(this)
 
         futuresSettled.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
@@ -108,7 +109,9 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                     tab!!.text.toString() == resources.getString(R.string.futures) -> {
                         futuresSettled.visibility = View.VISIBLE
                         when {
-                            futuresSettled.getTabAt(futuresSettled.selectedTabPosition)!!.text.toString() == resources.getString(R.string.btc_settled) -> {
+                            futuresSettled.getTabAt(futuresSettled.selectedTabPosition)!!.text.toString() == resources.getString(
+                                R.string.btc_settled
+                            ) -> {
                                 if (null != productsResponseList) {
                                     filteredProductsResponseList = productsResponseList
                                     homeRecyclerView.adapter = HomeAdapter(
@@ -121,7 +124,9 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                                     )
                                 }
                             }
-                            futuresSettled.getTabAt(futuresSettled.selectedTabPosition)!!.text.toString() == resources.getString(R.string.usdt_settled) -> {
+                            futuresSettled.getTabAt(futuresSettled.selectedTabPosition)!!.text.toString() == resources.getString(
+                                R.string.usdt_settled
+                            ) -> {
                                 if (null != productsResponseList) {
                                     filteredProductsResponseList = productsResponseList
                                     homeRecyclerView.adapter = HomeAdapter(
@@ -164,7 +169,9 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                     tab!!.text.toString() == resources.getString(R.string.futures) -> {
                         futuresSettled.visibility = View.VISIBLE
                         when {
-                            futuresSettled.getTabAt(futuresSettled.selectedTabPosition)!!.text.toString() == resources.getString(R.string.btc_settled) -> {
+                            futuresSettled.getTabAt(futuresSettled.selectedTabPosition)!!.text.toString() == resources.getString(
+                                R.string.btc_settled
+                            ) -> {
                                 if (null != productsResponseList) {
                                     filteredProductsResponseList = productsResponseList
                                     homeRecyclerView.adapter = HomeAdapter(
@@ -177,7 +184,9 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                                     )
                                 }
                             }
-                            futuresSettled.getTabAt(futuresSettled.selectedTabPosition)!!.text.toString() == resources.getString(R.string.usdt_settled) -> {
+                            futuresSettled.getTabAt(futuresSettled.selectedTabPosition)!!.text.toString() == resources.getString(
+                                R.string.usdt_settled
+                            ) -> {
                                 if (null != productsResponseList) {
                                     filteredProductsResponseList = productsResponseList
                                     homeRecyclerView.adapter = HomeAdapter(
@@ -224,8 +233,7 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onRefresh() {
-        homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
-        homeViewModel.init(requireActivity())
+
         homeViewModel.getProducts()!!.observe(viewLifecycleOwner, Observer { list ->
             if (null != list) {
                 productsResponseList = list
@@ -235,7 +243,9 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                         R.string.futures
                     ) -> {
                         when {
-                            futuresSettled.getTabAt(futuresSettled.selectedTabPosition)!!.text.toString() == resources.getString(R.string.btc_settled) -> {
+                            futuresSettled.getTabAt(futuresSettled.selectedTabPosition)!!.text.toString() == resources.getString(
+                                R.string.btc_settled
+                            ) -> {
                                 if (null != productsResponseList) {
                                     filteredProductsResponseList = productsResponseList
                                     homeRecyclerView.adapter = HomeAdapter(
@@ -248,7 +258,9 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                                     )
                                 }
                             }
-                            futuresSettled.getTabAt(futuresSettled.selectedTabPosition)!!.text.toString() == resources.getString(R.string.usdt_settled) -> {
+                            futuresSettled.getTabAt(futuresSettled.selectedTabPosition)!!.text.toString() == resources.getString(
+                                R.string.usdt_settled
+                            ) -> {
                                 if (null != productsResponseList) {
                                     filteredProductsResponseList = productsResponseList
                                     homeRecyclerView.adapter = HomeAdapter(

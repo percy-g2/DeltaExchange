@@ -1,7 +1,9 @@
 package crypto.delta.exchange.openexchange.api
 
+import android.app.Application
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
+import crypto.delta.exchange.openexchange.BaseViewModel
 import crypto.delta.exchange.openexchange.pojo.DeltaExchangeChartHistoryResponse
 import crypto.delta.exchange.openexchange.pojo.DeltaExchangeTickerResponse
 import crypto.delta.exchange.openexchange.pojo.OrderBookResponse
@@ -17,15 +19,15 @@ import retrofit2.Callback
 import retrofit2.Response
 
 
-class DeltaRepository {
+class DeltaRepository(application: Application) : BaseViewModel(application) {
     companion object {
         private var deltaRepository: DeltaRepository? = null
         private var context: Context? = null
 
-        fun getInstance(context: Context): DeltaRepository? {
-            this.context = context
+        fun getInstance(application: Application): DeltaRepository? {
+            this.context = application.applicationContext
             if (deltaRepository == null) {
-                deltaRepository = DeltaRepository()
+                deltaRepository = DeltaRepository(application)
             }
             return deltaRepository
         }

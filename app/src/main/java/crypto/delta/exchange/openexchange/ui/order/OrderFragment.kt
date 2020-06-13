@@ -23,8 +23,7 @@ import crypto.delta.exchange.openexchange.R
 import crypto.delta.exchange.openexchange.adapter.BuyOrderBookAdapter
 import crypto.delta.exchange.openexchange.adapter.SellOrderBookAdapter
 import crypto.delta.exchange.openexchange.api.NoConnectivityException
-import crypto.delta.exchange.openexchange.pojo.Buy
-import crypto.delta.exchange.openexchange.pojo.Sell
+import crypto.delta.exchange.openexchange.pojo.*
 import crypto.delta.exchange.openexchange.pojo.order.ChangeOrderLeverageBody
 import crypto.delta.exchange.openexchange.pojo.order.CreateOrderRequest
 import crypto.delta.exchange.openexchange.pojo.order.CreateOrderResponse
@@ -38,7 +37,10 @@ import io.reactivex.observers.DisposableObserver
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_order.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 
@@ -58,6 +60,9 @@ class OrderFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        orderBookViewModel =
+            ViewModelProvider(this@OrderFragment).get(OrderBookViewModel::class.java)
+        orderBookViewModel.init(requireContext())
         return inflater.inflate(R.layout.fragment_order, container, false)
     }
 
@@ -111,24 +116,23 @@ class OrderFragment : BaseFragment() {
             )
         )
 
-        CoroutineScope(Dispatchers.Main).launch {
-            delay(500)
-            orderBookViewModel = ViewModelProvider(this@OrderFragment).get(OrderBookViewModel::class.java)
-            orderBookViewModel.init(requireContext())
-            orderBookViewModel.observeWebSocketEvent()
-            orderBookViewModel.observeOrderBook().observe(viewLifecycleOwner, Observer {
-                if (null != it) {
-                    buyOrderBookAdapter!!.updateOrderBook(it.buy!!)
-                    sellOrderBookAdapter!!.updateOrderBook(it.sell!!)
-                    if (buyLayoutManager!!.findFirstVisibleItemPosition() == 0) {
-                        buyLayoutManager!!.scrollToPositionWithOffset(0, 0)
-                    }
-                    if (sellLayoutManager!!.findFirstVisibleItemPosition() == 0) {
-                        sellLayoutManager!!.scrollToPositionWithOffset(0, 0)
-                    }
+        orderBookViewModel.observeWebSocketEvent()
+        orderBookViewModel.observeOrderBook().observe(viewLifecycleOwner, Observer {
+            if (null != it) {
+                buyOrderBookAdapter!!.updateOrderBook(it.buy!!)
+                sellOrderBookAdapter!!.updateOrderBook(it.sell!!)
+                if (buyLayoutManager!!.findFirstVisibleItemPosition() == 0) {
+                    buyLayoutManager!!.scrollToPositionWithOffset(0, 0)
                 }
-            })
-        }
+                if (sellLayoutManager!!.findFirstVisibleItemPosition() == 0) {
+                    sellLayoutManager!!.scrollToPositionWithOffset(0, 0)
+                }
+                if (progressSpinner.visibility == View.VISIBLE) {
+                    progressSpinner.visibility = View.GONE
+                }
+            }
+        })
+
 
         var leverageChangedByUser = false
         val timeStamp = KotlinUtils.generateTimeStamp()
@@ -682,5 +686,22 @@ class OrderFragment : BaseFragment() {
             }
             return "null"
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        val channel2 = Channel()
+        channel2.name = "l2_orderbook"
+        channel2.symbols = arrayListOf()
+
+        val payload = Payload()
+        payload.channels = arrayListOf(channel2)
+        val subscribe = Subscribe(
+            "unsubscribe",
+            payload
+        )
+
+        // Subscribe to Bitcoin ticker
+        orderBookViewModel.sendUnSubscribe(subscribe)
     }
 }

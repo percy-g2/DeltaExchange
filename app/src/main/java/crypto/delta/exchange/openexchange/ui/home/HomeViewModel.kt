@@ -1,20 +1,21 @@
 package crypto.delta.exchange.openexchange.ui.home
 
+import android.app.Application
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import crypto.delta.exchange.openexchange.BaseViewModel
 import crypto.delta.exchange.openexchange.api.DeltaRepository
 import crypto.delta.exchange.openexchange.pojo.products.ProductsResponse
 import io.reactivex.disposables.CompositeDisposable
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(application: Application) : BaseViewModel(application) {
     private var mutableLiveData: MutableLiveData<List<ProductsResponse>>? = null
     private var deltaRepository: DeltaRepository? = null
     private val disposables: CompositeDisposable = CompositeDisposable()
 
     fun init(context: Context) {
-        deltaRepository = DeltaRepository.getInstance(context)
+        deltaRepository = DeltaRepository.getInstance(this.getApplication())
     }
 
     fun getProducts(): LiveData<List<ProductsResponse>>? {

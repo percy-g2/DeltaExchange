@@ -20,7 +20,7 @@ class HomeAdapter(
     private val requireActivity: FragmentActivity
 ) : RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
 
-    private val deltaRepository = DeltaRepository.getInstance(requireActivity)
+    private val deltaRepository = DeltaRepository.getInstance(requireActivity.application)
 
     override fun getItemCount() = productsResponseList.size
 
@@ -45,16 +45,16 @@ class HomeAdapter(
             requireActivity.findNavController(R.id.nav_host_fragment)
                 .navigate(R.id.navigation_chart, null, KotlinUtils.getNavOptions())
         }
-        deltaRepository!!.getProductsData(product.symbol!!)!!.observe(requireActivity, Observer { tickerResponse ->
-            if (null != tickerResponse.close) {
-                holder.lastPrice.text = tickerResponse.close?.toBigDecimal()?.toPlainString()
-                holder.dayVolume.text = String.format(tickerResponse.volume!!.toString() + " " + product.quotingAsset!!.symbol)
-            }
-        })
+        deltaRepository!!.getProductsData(product.symbol!!)!!
+            .observe(requireActivity, Observer { tickerResponse ->
+                if (null != tickerResponse.close) {
+                    holder.lastPrice.text = tickerResponse.close?.toBigDecimal()?.toPlainString()
+                    holder.dayVolume.text =
+                        String.format(tickerResponse.volume!!.toString() + " " + product.quotingAsset!!.symbol)
+                }
+            })
 
     }
-
-
 
 
 }
