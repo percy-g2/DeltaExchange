@@ -73,4 +73,6 @@
     <string name="entry_price">Entry Price</string>
     <string name="liq_price">Liq. Price</string>
     <string name="margin">Margin</string>
+    <string name="api_details">API Details</string>
+    <string name="test_net_server">Test Net Server</string>
 </resources>

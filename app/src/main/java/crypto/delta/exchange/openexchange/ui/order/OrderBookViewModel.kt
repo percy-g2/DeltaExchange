@@ -5,8 +5,10 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
+import com.tinder.scarlet.Lifecycle
 import com.tinder.scarlet.Scarlet
 import com.tinder.scarlet.WebSocket
+import com.tinder.scarlet.lifecycle.android.AndroidLifecycle
 import com.tinder.scarlet.messageadapter.moshi.MoshiMessageAdapter
 import com.tinder.scarlet.retry.ExponentialWithJitterBackoffStrategy
 import com.tinder.scarlet.streamadapter.rxjava2.RxJava2StreamAdapterFactory
@@ -33,7 +35,7 @@ class OrderBookViewModel(application: Application) : BaseViewModel(application) 
 
     private lateinit var appPreferenceManager: AppPreferenceManager
     private val backoffStrategy = ExponentialWithJitterBackoffStrategy(5000, 5000)
-
+    val foreground: Lifecycle = AndroidLifecycle.ofApplicationForeground(application)
     private val okHttpClient = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
         .readTimeout(10, TimeUnit.SECONDS)
@@ -50,15 +52,14 @@ class OrderBookViewModel(application: Application) : BaseViewModel(application) 
         } else {
             Native.deltaExchangeBaseWebSocketUrl
         }
-        if (deltaExchangeSocketServiceRepository == null) {
-            deltaExchangeSocketServiceRepository = Scarlet.Builder()
-                .webSocketFactory(okHttpClient.newWebSocketFactory(baseUrl))
-                .addMessageAdapterFactory(MoshiMessageAdapter.Factory())
-                .addStreamAdapterFactory(RxJava2StreamAdapterFactory())
-                .backoffStrategy(backoffStrategy)
-                .build()
-                .create()
-        }
+        deltaExchangeSocketServiceRepository = Scarlet.Builder()
+            .webSocketFactory(okHttpClient.newWebSocketFactory(baseUrl))
+            .addMessageAdapterFactory(MoshiMessageAdapter.Factory())
+            .addStreamAdapterFactory(RxJava2StreamAdapterFactory())
+            .backoffStrategy(backoffStrategy)
+            .lifecycle(foreground)
+            .build()
+            .create()
     }
 
     fun observeWebSocketEvent() {
@@ -76,15 +77,15 @@ class OrderBookViewModel(application: Application) : BaseViewModel(application) 
                         "subscribe",
                         payload
                     )
-                // Subscribe
-                sendSubscribe(subscribe)
-            }
-        }, { error ->
-            Log.e(
-                OrderBookViewModel::class.java.simpleName,
-                "Error while observing socket ${error.cause}"
-            )
-        }).addTo(disposables)
+                    // Subscribe
+                    sendSubscribe(subscribe)
+                }
+            }, { error ->
+                Log.e(
+                    OrderBookViewModel::class.java.simpleName,
+                    "Error while observing socket ${error.cause}"
+                )
+            }).addTo(disposables)
     }
 
     fun observeOrderBook(): MutableLiveData<DeltaExchangeL2OrderBookResponse> {
@@ -129,12 +130,12 @@ class OrderBookViewModel(application: Application) : BaseViewModel(application) 
     }
 
     private fun sendSubscribe(action: Subscribe) {
-        return deltaExchangeSocketServiceRepository!!.sendSubscribe(action)
+        deltaExchangeSocketServiceRepository!!.sendSubscribe(action)
     }
 
 
     fun sendUnSubscribe(action: Subscribe) {
-        return deltaExchangeSocketServiceRepository!!.sendUnSubscribe(action)
+        deltaExchangeSocketServiceRepository!!.sendUnSubscribe(action)
     }
 
     override fun onCleared() {
