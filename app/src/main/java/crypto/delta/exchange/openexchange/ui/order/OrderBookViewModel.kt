@@ -38,7 +38,7 @@ class OrderBookViewModel(application: Application) : BaseViewModel(application) 
         .connectTimeout(10, TimeUnit.SECONDS)
         .readTimeout(10, TimeUnit.SECONDS)
         .writeTimeout(10, TimeUnit.SECONDS)
-        .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+        .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.NONE))
         .build()
 
     private lateinit var baseUrl: String
@@ -62,17 +62,20 @@ class OrderBookViewModel(application: Application) : BaseViewModel(application) 
     }
 
     fun observeWebSocketEvent() {
-        deltaExchangeSocketServiceRepository!!.observeWebSocketEvent().subscribe({
-            if (it is WebSocket.Event.OnConnectionOpened<*>) {
-                val channel2 = Channel()
-                channel2.name = "l2_orderbook"
-                channel2.symbols = arrayListOf(appPreferenceManager!!.currentProductSymbol!!)
-                val payload = Payload()
-                payload.channels = arrayListOf(channel2)
-                val subscribe = Subscribe(
-                    "subscribe",
-                    payload
-                )
+        deltaExchangeSocketServiceRepository!!.observeWebSocketEvent()
+            .subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                if (it is WebSocket.Event.OnConnectionOpened<*>) {
+                    val channel2 = Channel()
+                    channel2.name = "l2_orderbook"
+                    channel2.symbols = arrayListOf(appPreferenceManager.currentProductSymbol!!)
+                    val payload = Payload()
+                    payload.channels = arrayListOf(channel2)
+                    val subscribe = Subscribe(
+                        "subscribe",
+                        payload
+                    )
                 // Subscribe
                 sendSubscribe(subscribe)
             }
@@ -100,15 +103,15 @@ class OrderBookViewModel(application: Application) : BaseViewModel(application) 
                                 data,
                                 DeltaExchangeL2OrderBookResponse::class.java
                             )
-                        if (response.buy!!.size > 8) {
+                        if (response.buy!!.size > 12) {
                             response.buy =
-                                response.buy!!.slice(IntRange(1, 8)).sortedBy {
+                                response.buy!!.slice(IntRange(1, 12)).sortedBy {
                                     it.d_size
                                 }
                         }
-                        if (response.sell!!.size > 8) {
+                        if (response.sell!!.size > 12) {
                             response.sell =
-                                response.sell!!.slice(IntRange(1, 8)).sortedBy {
+                                response.sell!!.slice(IntRange(1, 12)).sortedBy {
                                     it.d_size
                                 }
                         }

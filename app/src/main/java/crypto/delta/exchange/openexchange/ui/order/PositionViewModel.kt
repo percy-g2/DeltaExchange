@@ -5,10 +5,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import crypto.delta.exchange.openexchange.BaseViewModel
 import crypto.delta.exchange.openexchange.api.DeltaRepository
-import crypto.delta.exchange.openexchange.pojo.order.CreateOrderResponse
+import crypto.delta.exchange.openexchange.pojo.position.OpenPositionResponse
 
-class OpenOrdersViewModel(application: Application) : BaseViewModel(application) {
-    private var mutableLiveData: MutableLiveData<List<CreateOrderResponse>?>? = null
+class PositionViewModel(application: Application) : BaseViewModel(application) {
+    private var mutableLiveData: MutableLiveData<List<OpenPositionResponse>?>? = null
     private var deltaRepository: DeltaRepository? = null
 
     fun init() {
@@ -17,15 +17,13 @@ class OpenOrdersViewModel(application: Application) : BaseViewModel(application)
         }
     }
 
-    fun getOrders(
+    fun getOpenPositions(
         apiKey: String,
         timestamp: String,
-        signature: String,
-        productId: String,
-        state: String
-    ): LiveData<List<CreateOrderResponse>?>? {
+        signature: String
+    ): LiveData<List<OpenPositionResponse>?>? {
         mutableLiveData =
-            deltaRepository!!.getOrders(apiKey, timestamp, signature, productId, state)
+            deltaRepository!!.getOpenPositions(apiKey, timestamp, signature)
         return mutableLiveData
     }
 }

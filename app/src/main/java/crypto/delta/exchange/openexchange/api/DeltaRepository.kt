@@ -8,6 +8,7 @@ import crypto.delta.exchange.openexchange.pojo.DeltaExchangeChartHistoryResponse
 import crypto.delta.exchange.openexchange.pojo.DeltaExchangeTickerResponse
 import crypto.delta.exchange.openexchange.pojo.OrderBookResponse
 import crypto.delta.exchange.openexchange.pojo.order.CreateOrderResponse
+import crypto.delta.exchange.openexchange.pojo.position.OpenPositionResponse
 import crypto.delta.exchange.openexchange.pojo.products.ProductsResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -88,6 +89,33 @@ class DeltaRepository(application: Application) : BaseViewModel(application) {
             }
 
             override fun onFailure(call: Call<List<CreateOrderResponse>?>?, t: Throwable?) {
+                data.value = null
+            }
+        })
+        return data
+    }
+
+    fun getOpenPositions(
+        apiKey: String,
+        timestamp: String,
+        signature: String
+    ): MutableLiveData<List<OpenPositionResponse>?> {
+        val data: MutableLiveData<List<OpenPositionResponse>?> =
+            MutableLiveData<List<OpenPositionResponse>?>()
+        deltaExchangeApiEndPoints!!.getOpenPositions(apiKey, timestamp, signature).enqueue(object :
+            Callback<List<OpenPositionResponse>?> {
+            override fun onResponse(
+                call: Call<List<OpenPositionResponse>?>?,
+                response: Response<List<OpenPositionResponse>?>
+            ) {
+                if (response.isSuccessful) {
+                    data.value = response.body()
+                } else {
+                    data.value = null
+                }
+            }
+
+            override fun onFailure(call: Call<List<OpenPositionResponse>?>?, t: Throwable?) {
                 data.value = null
             }
         })

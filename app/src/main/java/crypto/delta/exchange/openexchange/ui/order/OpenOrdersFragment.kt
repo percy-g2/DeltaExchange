@@ -21,7 +21,7 @@ class OpenOrdersFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         openOrdersViewModel =
             ViewModelProvider(this@OpenOrdersFragment).get(OpenOrdersViewModel::class.java)
-        openOrdersViewModel.init(requireActivity())
+        openOrdersViewModel.init()
         return inflater.inflate(R.layout.fragment_open_orders, container, false)
     }
 

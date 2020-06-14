@@ -70,4 +70,7 @@
     <string name="filled_left">Filled/Left</string>
     <string name="value">Value</string>
     <string name="type">Type</string>
+    <string name="entry_price">Entry Price</string>
+    <string name="liq_price">Liq. Price</string>
+    <string name="margin">Margin</string>
 </resources>

@@ -7,6 +7,7 @@ import crypto.delta.exchange.openexchange.pojo.order.ChangeOrderLeverageBody
 import crypto.delta.exchange.openexchange.pojo.order.CreateOrderRequest
 import crypto.delta.exchange.openexchange.pojo.order.CreateOrderResponse
 import crypto.delta.exchange.openexchange.pojo.order.OrderLeverageResponse
+import crypto.delta.exchange.openexchange.pojo.position.OpenPositionResponse
 import crypto.delta.exchange.openexchange.pojo.products.ProductsResponse
 import io.reactivex.Observable
 import retrofit2.Call
@@ -66,4 +67,11 @@ interface DeltaExchangeApiEndPoints {
         @Header("signature") signature: String,
         @Query("state") state: String
     ): Call<List<CreateOrderResponse>>
+
+    @GET("/positions")
+    fun getOpenPositions(
+        @Header("api-key") apiKey: String,
+        @Header("timestamp") timestamp: String,
+        @Header("signature") signature: String
+    ): Call<List<OpenPositionResponse>>
 }

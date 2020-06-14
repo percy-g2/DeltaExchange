@@ -123,9 +123,13 @@ class OrderFragment : BaseFragment() {
                 sellOrderBookAdapter!!.updateOrderBook(it.sell!!)
                 if (buyLayoutManager!!.findFirstVisibleItemPosition() == 0) {
                     buyLayoutManager!!.scrollToPositionWithOffset(0, 0)
+                } else {
+                    buyOrderBookRecyclerView.scrollToPosition(buyLayoutManager!!.findLastVisibleItemPosition() - 1)
                 }
                 if (sellLayoutManager!!.findFirstVisibleItemPosition() == 0) {
                     sellLayoutManager!!.scrollToPositionWithOffset(0, 0)
+                } else {
+                    sellOrderBookRecyclerView.scrollToPosition(sellLayoutManager!!.findLastVisibleItemPosition() - 1)
                 }
                 if (progressSpinner.visibility == View.VISIBLE) {
                     progressSpinner.visibility = View.GONE
@@ -664,13 +668,13 @@ class OrderFragment : BaseFragment() {
             return when (position) {
                 0 -> {
                     // find first fragment...
-                    Fragment()
+                    PositionsFragment()
                 }
                 1 -> {
                     // find second fragment...
                     OpenOrdersFragment()
                 }
-                else -> Fragment()
+                else -> PositionsFragment()
             }
         }
 

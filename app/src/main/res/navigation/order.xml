@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/order"
+    app:startDestination="@+id/navigation_order">
+    <fragment
+        android:id="@+id/navigation_order"
+        android:name="crypto.delta.exchange.openexchange.ui.order.OrderFragment"
+        android:label="@string/title_order"
+        tools:layout="@layout/fragment_order" />
+</navigation>

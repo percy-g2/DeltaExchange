@@ -12,7 +12,6 @@ import crypto.delta.exchange.openexchange.R
 import crypto.delta.exchange.openexchange.api.DeltaRepository
 import crypto.delta.exchange.openexchange.pojo.products.ProductsResponse
 import crypto.delta.exchange.openexchange.utils.AppPreferenceManager
-import crypto.delta.exchange.openexchange.utils.KotlinUtils
 
 
 class HomeAdapter(
@@ -43,7 +42,7 @@ class HomeAdapter(
             AppPreferenceManager(requireActivity).setCurrentProductSymbol(product.symbol)
             AppPreferenceManager(requireActivity).setCurrentProductId(product.id.toString())
             requireActivity.findNavController(R.id.nav_host_fragment)
-                .navigate(R.id.navigation_chart, null, KotlinUtils.getNavOptions())
+                .navigate(R.id.action_to_chart)
         }
         deltaRepository!!.getProductsData(product.symbol!!)!!
             .observe(requireActivity, Observer { tickerResponse ->
