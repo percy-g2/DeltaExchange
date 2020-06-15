@@ -1,5 +1,6 @@
 package crypto.delta.exchange.openexchange.ui.order
 
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -60,14 +61,16 @@ class OrderFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         orderBookViewModel =
             ViewModelProvider(this@OrderFragment).get(OrderBookViewModel::class.java)
-        orderBookViewModel.init(requireContext())
+        orderBookViewModel.init()
         return inflater.inflate(R.layout.fragment_order, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        currentSymbol.text = appPreferenceManager!!.currentProductSymbol!!
         val sectionsPagerAdapter = SectionsPagerAdapter(childFragmentManager)
         viewPager!!.adapter = sectionsPagerAdapter
         viewPager!!.currentItem = 0
@@ -117,7 +120,7 @@ class OrderFragment : BaseFragment() {
         )
 
         orderBookViewModel.observeWebSocketEvent()
-        orderBookViewModel.observeOrderBook().observe(viewLifecycleOwner, Observer {
+        orderBookViewModel.observeOrderBook().observe(viewLifecycleOwner, Observer { it ->
             if (null != it) {
                 buyOrderBookAdapter!!.updateOrderBook(it.buy!!)
                 sellOrderBookAdapter!!.updateOrderBook(it.sell!!)
@@ -134,6 +137,12 @@ class OrderFragment : BaseFragment() {
                 if (progressSpinner.visibility == View.VISIBLE) {
                     progressSpinner.visibility = View.GONE
                 }
+                orderBookViewModel.getRecentTrade(appPreferenceManager!!.currentProductId!!)
+                    .observe(viewLifecycleOwner, Observer { recent ->
+                        if (null != recent) {
+                            lastPriceTxt.text = recent.recentTrades!!.first().price
+                        }
+                    })
             }
         })
 
@@ -249,12 +258,12 @@ class OrderFragment : BaseFragment() {
         orderTypeRadioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.checkedLimit -> {
-                    limitPriceTextInputLayout.visibility = View.VISIBLE
+                    edtLimitPrice.visibility = View.VISIBLE
                     tifLayout.visibility = View.VISIBLE
                     checkPostOnly.visibility = View.VISIBLE
                 }
                 R.id.checkedMarket -> {
-                    limitPriceTextInputLayout.visibility = View.GONE
+                    edtLimitPrice.visibility = View.GONE
                     tifLayout.visibility = View.GONE
                     checkPostOnly.visibility = View.GONE
                 }

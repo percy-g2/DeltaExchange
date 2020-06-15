@@ -7,15 +7,7 @@
     <string name="price">"Price"</string>
     <string name="size">"Size"</string>
 
-    <string name="fifteenMins">15m</string>
-    <string name="sixHours">6h</string>
-    <string name="oneDay">24h</string>
-    <string name="threeDay">3D</string>
-    <string name="Week">7D</string>
-    <string name="twoWeeks">14D</string>
-    <string name="Month">1M</string>
-    <string name="threeMonth">3M</string>
-    <string name="Year">1y</string>
+
     <string name="unrounded_usd_chart_price_format">&#36; %1$s</string>
     <string name="settings">Settings</string>
     <string name="taker">Taker</string>
@@ -52,8 +44,6 @@
     <string name="configure_api_key_first">Configure API key first</string>
     <string name="post_only_flag_is_for_gtc">Post only flag is for GTC</string>
     <string name="title_home">Home</string>
-    <string name="current_product_id_preference">current_product_id_preference</string>
-    <string name="current_product_symbol_preference">current_product_symbol_preference</string>
     <string name="crypto">Crypto</string>
     <string name="derivatives">Derivatives</string>
     <string name="exchange">Exchange</string>
@@ -75,4 +65,17 @@
     <string name="margin">Margin</string>
     <string name="api_details">API Details</string>
     <string name="test_net_server">Test Net Server</string>
+    <string name="last_price">Last Price:</string>
+    <string name="fiveMin">5m</string>
+    <string name="fifteenMins">15m</string>
+    <string name="thirtyMins">30m</string>
+    <string name="oneHour">1h</string>
+    <string name="fourHours">4h</string>
+    <string name="sixHours">6h</string>
+    <string name="oneDay">1d</string>
+    <string name="oneWeek">1w</string>
+    <string name="oneMonth">1Mon</string>
+    <string name="chart_resolution_preference">chart_resolution_preference</string>
+    <string name="product_id_preference">product_id_preference</string>
+    <string name="product_symbol_preference">product_symbol_preference</string>
 </resources>

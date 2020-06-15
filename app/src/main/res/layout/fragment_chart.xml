@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:local="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -10,41 +11,82 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/currentSymbol"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="8dp"
+            android:gravity="center"
+            android:textColor="@color/colorAccent"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            local:text="BTCUSD" />
+
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/currentSymbol"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_margin="8dp"
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/chartResolutionTab"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
                 android:layout_weight="1"
-                android:gravity="center"
-                android:text="BTCUSD"
-                android:textColor="@color/colorAccent"
-                android:textSize="25sp"
-                android:textStyle="bold" />
+                android:layout_gravity="start"
+                app:tabBackground="@color/colorPrimaryAlternate"
+                app:tabGravity="fill"
+                app:tabIconTint="@color/primaryTextColor"
+                app:tabIconTintMode="multiply"
+                app:tabIndicatorColor="@color/colorAccent"
+                app:tabMode="auto"
+                app:tabTextColor="@color/primaryTextColor">
 
-            <androidx.appcompat.widget.AppCompatSpinner
-                android:id="@+id/resolutionSpinner"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_margin="8dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/primaryTextColor"
-                android:entries="@array/resolution_range"
-                android:gravity="center"
-                android:textColor="@color/primaryTextColor"
-                android:textSize="25sp"
-                android:textStyle="bold" />
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/fiveMin" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/fifteenMins" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/thirtyMins" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/oneHour" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/fourHours" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sixHours" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/oneDay" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/oneWeek" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/oneMonth" />
+            </com.google.android.material.tabs.TabLayout>
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <com.liihuu.klinechart.KLineChartView

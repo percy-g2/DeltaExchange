@@ -1,8 +1,8 @@
 package crypto.delta.exchange.openexchange.ui.order
 
 import android.app.Application
-import android.content.Context
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.tinder.scarlet.Lifecycle
@@ -15,10 +15,8 @@ import com.tinder.scarlet.streamadapter.rxjava2.RxJava2StreamAdapterFactory
 import com.tinder.scarlet.websocket.okhttp.newWebSocketFactory
 import crypto.delta.exchange.openexchange.BaseViewModel
 import crypto.delta.exchange.openexchange.api.DeltaExchangeSocketServiceRepository
-import crypto.delta.exchange.openexchange.pojo.Channel
-import crypto.delta.exchange.openexchange.pojo.DeltaExchangeL2OrderBookResponse
-import crypto.delta.exchange.openexchange.pojo.Payload
-import crypto.delta.exchange.openexchange.pojo.Subscribe
+import crypto.delta.exchange.openexchange.api.DeltaRepository
+import crypto.delta.exchange.openexchange.pojo.*
 import crypto.delta.exchange.openexchange.utils.AppPreferenceManager
 import crypto.delta.exchange.openexchange.utils.Native
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -32,10 +30,10 @@ import java.util.concurrent.TimeUnit
 class OrderBookViewModel(application: Application) : BaseViewModel(application) {
     private val disposables: CompositeDisposable = CompositeDisposable()
     private var deltaExchangeSocketServiceRepository: DeltaExchangeSocketServiceRepository? = null
-
+    private var deltaRepository: DeltaRepository? = null
     private lateinit var appPreferenceManager: AppPreferenceManager
     private val backoffStrategy = ExponentialWithJitterBackoffStrategy(5000, 5000)
-    val foreground: Lifecycle = AndroidLifecycle.ofApplicationForeground(application)
+    private val foreground: Lifecycle = AndroidLifecycle.ofApplicationForeground(application)
     private val okHttpClient = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
         .readTimeout(10, TimeUnit.SECONDS)
@@ -43,23 +41,21 @@ class OrderBookViewModel(application: Application) : BaseViewModel(application) 
         .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.NONE))
         .build()
 
-    private lateinit var baseUrl: String
-
-    fun init(context: Context) {
-        appPreferenceManager = AppPreferenceManager(context)
-        baseUrl = if (appPreferenceManager.useTestNetServer!!) {
-            Native.deltaExchangeTestNetBaseWebSocketUrl
-        } else {
-            Native.deltaExchangeBaseWebSocketUrl
-        }
+    fun init() {
+        appPreferenceManager = AppPreferenceManager(this.getApplication())
+        deltaRepository = DeltaRepository.getInstance(this.getApplication())
         deltaExchangeSocketServiceRepository = Scarlet.Builder()
-            .webSocketFactory(okHttpClient.newWebSocketFactory(baseUrl))
+            .webSocketFactory(okHttpClient.newWebSocketFactory(Native.deltaExchangeBaseWebSocketUrl))
             .addMessageAdapterFactory(MoshiMessageAdapter.Factory())
             .addStreamAdapterFactory(RxJava2StreamAdapterFactory())
             .backoffStrategy(backoffStrategy)
             .lifecycle(foreground)
             .build()
             .create()
+    }
+
+    fun getRecentTrade(productId: String): LiveData<OrderBookResponse?> {
+        return deltaRepository!!.getOrderBook(productId)
     }
 
     fun observeWebSocketEvent() {
@@ -85,6 +81,7 @@ class OrderBookViewModel(application: Application) : BaseViewModel(application) 
                     OrderBookViewModel::class.java.simpleName,
                     "Error while observing socket ${error.cause}"
                 )
+                error.printStackTrace()
             }).addTo(disposables)
     }
 

@@ -50,6 +50,9 @@ class HomeAdapter(
                     holder.lastPrice.text = tickerResponse.close?.toBigDecimal()?.toPlainString()
                     holder.dayVolume.text =
                         String.format(tickerResponse.volume!!.toString() + " " + product.quotingAsset!!.symbol)
+                } else {
+                    holder.lastPrice.text = "--"
+                    holder.dayVolume.text = "--"
                 }
             })
 
