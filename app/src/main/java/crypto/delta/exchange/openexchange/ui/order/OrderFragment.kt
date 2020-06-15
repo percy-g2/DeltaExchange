@@ -11,20 +11,14 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
 import com.warkiz.tickseekbar.OnSeekChangeListener
 import com.warkiz.tickseekbar.SeekParams
 import com.warkiz.tickseekbar.TickSeekBar
 import crypto.delta.exchange.openexchange.R
-import crypto.delta.exchange.openexchange.adapter.BuyOrderBookAdapter
-import crypto.delta.exchange.openexchange.adapter.SellOrderBookAdapter
 import crypto.delta.exchange.openexchange.api.NoConnectivityException
-import crypto.delta.exchange.openexchange.pojo.*
+import crypto.delta.exchange.openexchange.pojo.ErrorResponse
 import crypto.delta.exchange.openexchange.pojo.order.ChangeOrderLeverageBody
 import crypto.delta.exchange.openexchange.pojo.order.CreateOrderRequest
 import crypto.delta.exchange.openexchange.pojo.order.OrderLeverageResponse
@@ -45,13 +39,6 @@ import java.net.SocketTimeoutException
 
 class OrderFragment : BaseFragment() {
     private val logTag: String? = OrderFragment::class.java.simpleName
-    private var buyOrderBookAdapter: BuyOrderBookAdapter? = null
-    private var sellOrderBookAdapter: SellOrderBookAdapter? = null
-    private var buyOrderBookList: List<Buy> = ArrayList()
-    private var sellOrderBookList: List<Sell> = ArrayList()
-    private var buyLayoutManager: LinearLayoutManager? = null
-    private var sellLayoutManager: LinearLayoutManager? = null
-    private lateinit var orderBookViewModel: OrderBookViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,9 +46,6 @@ class OrderFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View? {
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        orderBookViewModel =
-            ViewModelProvider(this@OrderFragment).get(OrderBookViewModel::class.java)
-        orderBookViewModel.init()
         return inflater.inflate(R.layout.fragment_order, container, false)
     }
 
@@ -91,57 +75,34 @@ class OrderFragment : BaseFragment() {
             )
         )
 
-        buyLayoutManager = LinearLayoutManager(requireContext())
-        sellLayoutManager = LinearLayoutManager(requireContext())
-        buyOrderBookAdapter = BuyOrderBookAdapter(buyOrderBookList)
-        sellOrderBookAdapter = SellOrderBookAdapter(sellOrderBookList)
+        val orderBookRecentTradeSectionsPagerAdapter =
+            OrderBookRecentTradeSectionsPagerAdapter(childFragmentManager)
+        orderBookRecentTradeViewPage!!.adapter = orderBookRecentTradeSectionsPagerAdapter
+        orderBookRecentTradeViewPage!!.currentItem = 0
 
-        buyOrderBookRecyclerView.layoutManager = buyLayoutManager
-        buyOrderBookRecyclerView.adapter = buyOrderBookAdapter
-        buyOrderBookRecyclerView.itemAnimator = null
-        buyOrderBookRecyclerView.addItemDecoration(
-            DividerItemDecoration(
-                requireContext(),
-                DividerItemDecoration.VERTICAL
-            )
-        )
+        orderBookRecentTradeTabLayout.addOnTabSelectedListener(object :
+            TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                orderBookRecentTradeViewPage.currentItem =
+                    orderBookRecentTradeTabLayout.selectedTabPosition
+            }
 
-        sellOrderBookRecyclerView.layoutManager = sellLayoutManager
-        sellOrderBookRecyclerView.adapter = sellOrderBookAdapter
-        sellOrderBookRecyclerView.itemAnimator = null
-        sellOrderBookRecyclerView.addItemDecoration(
-            DividerItemDecoration(
-                requireContext(),
-                DividerItemDecoration.VERTICAL
-            )
-        )
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+                orderBookRecentTradeViewPage.currentItem =
+                    orderBookRecentTradeTabLayout.selectedTabPosition
+            }
 
-        orderBookViewModel.observeWebSocketEvent()
-        orderBookViewModel.observeOrderBook().observe(viewLifecycleOwner, Observer {
-            if (null != it) {
-                buyOrderBookAdapter!!.updateOrderBook(it.buy!!)
-                sellOrderBookAdapter!!.updateOrderBook(it.sell!!)
-                if (buyLayoutManager!!.findFirstVisibleItemPosition() == 0) {
-                    buyLayoutManager!!.scrollToPositionWithOffset(0, 0)
-                } else {
-                    buyOrderBookRecyclerView.scrollToPosition(buyLayoutManager!!.findLastVisibleItemPosition() - 1)
-                }
-                if (sellLayoutManager!!.findFirstVisibleItemPosition() == 0) {
-                    sellLayoutManager!!.scrollToPositionWithOffset(0, 0)
-                } else {
-                    sellOrderBookRecyclerView.scrollToPosition(sellLayoutManager!!.findLastVisibleItemPosition() - 1)
-                }
-                if (progressSpinner.visibility == View.VISIBLE) {
-                    progressSpinner.visibility = View.GONE
-                }
-                orderBookViewModel.getRecentTrade(appPreferenceManager!!.currentProductId!!)
-                    .observe(viewLifecycleOwner, Observer { recent ->
-                        if (null != recent) {
-                            lastPriceTxt.text = recent.recentTrades!!.first().price
-                        }
-                    })
+            override fun onTabUnselected(p0: TabLayout.Tab?) {
+
             }
         })
+        orderBookRecentTradeViewPage.addOnPageChangeListener(
+            TabLayout.TabLayoutOnPageChangeListener(
+                orderBookRecentTradeTabLayout
+            )
+        )
+
+
 
         if (!KotlinUtils.apiDetailsPresent(requireContext())) {
             btnPlaceOrder.backgroundTintList =
@@ -764,20 +725,36 @@ class OrderFragment : BaseFragment() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        val channel2 = Channel()
-        channel2.name = "l2_orderbook"
-        channel2.symbols = arrayListOf()
+    /**
+     * Used for tab paging...
+     */
+    inner class OrderBookRecentTradeSectionsPagerAdapter internal constructor(fm: FragmentManager?) :
+        FragmentPagerAdapter(fm!!, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+        override fun getItem(position: Int): Fragment {
+            return when (position) {
+                0 -> {
+                    // find first fragment...
+                    OrderBookFragment()
+                }
+                1 -> {
+                    // find second fragment...
+                    RecentTradesFragment()
+                }
+                else -> OrderBookFragment()
+            }
+        }
 
-        val payload = Payload()
-        payload.channels = arrayListOf(channel2)
-        val subscribe = Subscribe(
-            "unsubscribe",
-            payload
-        )
+        override fun getCount(): Int {
+            // Show 2 total pages.
+            return 2
+        }
 
-        // Subscribe to Bitcoin ticker
-        orderBookViewModel.sendUnSubscribe(subscribe)
+        override fun getPageTitle(position: Int): CharSequence? {
+            when (position) {
+                0 -> return resources.getString(R.string.order_book)
+                1 -> return resources.getString(R.string.recent_trade)
+            }
+            return "null"
+        }
     }
 }

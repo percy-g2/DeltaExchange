@@ -82,4 +82,6 @@
     <string name="order_leverage_changed_successfully">Order leverage changed successfully</string>
     <string name="api_details_error">Check your API details</string>
     <string name="volumeTxt">Volume</string>
+    <string name="order_book">Order Book</string>
+    <string name="recent_trade">Recent Trade</string>
 </resources>
