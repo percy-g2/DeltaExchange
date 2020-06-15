@@ -27,27 +27,24 @@ import crypto.delta.exchange.openexchange.api.NoConnectivityException
 import crypto.delta.exchange.openexchange.pojo.*
 import crypto.delta.exchange.openexchange.pojo.order.ChangeOrderLeverageBody
 import crypto.delta.exchange.openexchange.pojo.order.CreateOrderRequest
-import crypto.delta.exchange.openexchange.pojo.order.CreateOrderResponse
 import crypto.delta.exchange.openexchange.pojo.order.OrderLeverageResponse
 import crypto.delta.exchange.openexchange.ui.base.BaseFragment
 import crypto.delta.exchange.openexchange.utils.KotlinUtils
 import es.dmoral.toasty.Toasty
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.observers.DisposableObserver
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_order.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 
 class OrderFragment : BaseFragment() {
     private val logTag: String? = OrderFragment::class.java.simpleName
-    private val disposables: CompositeDisposable = CompositeDisposable()
     private var buyOrderBookAdapter: BuyOrderBookAdapter? = null
     private var sellOrderBookAdapter: SellOrderBookAdapter? = null
     private var buyOrderBookList: List<Buy> = ArrayList()
@@ -120,7 +117,7 @@ class OrderFragment : BaseFragment() {
         )
 
         orderBookViewModel.observeWebSocketEvent()
-        orderBookViewModel.observeOrderBook().observe(viewLifecycleOwner, Observer { it ->
+        orderBookViewModel.observeOrderBook().observe(viewLifecycleOwner, Observer {
             if (null != it) {
                 buyOrderBookAdapter!!.updateOrderBook(it.buy!!)
                 sellOrderBookAdapter!!.updateOrderBook(it.sell!!)
@@ -146,73 +143,98 @@ class OrderFragment : BaseFragment() {
             }
         })
 
-
+        if (!KotlinUtils.apiDetailsPresent(requireContext())) {
+            btnPlaceOrder.backgroundTintList =
+                ContextCompat.getColorStateList(requireContext(), R.color.gray)
+        }
         var leverageChangedByUser = false
-        val timeStamp = KotlinUtils.generateTimeStamp()
-        val method = "GET"
-        val path = "/orders/leverage"
-        val queryString = "?product_id=" + appPreferenceManager!!.currentProductId!!
-        val payload = ""
-        val signatureData = method + timeStamp + path + queryString + payload
-        Log.d(logTag, signatureData)
-        val signature = KotlinUtils.generateSignature(
-            signatureData,
-            appPreferenceManager!!.apiSecret!!
-        )
-
         val progressBar = KotlinUtils.showProgressBar(
             requireActivity(),
             requireContext().resources.getString(R.string.please_wait)
         )
-        val observe = service!!.getOrderLeverage(
-            appPreferenceManager!!.apiKey!!,
-            timeStamp,
-            signature!!,
-            appPreferenceManager!!.currentProductId!!
-        )
-        observe.subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : DisposableObserver<OrderLeverageResponse>() {
-                override fun onComplete() {
-                    Log.d("getOrderLeverage", "onComplete")
+
+        if (KotlinUtils.apiDetailsPresent(requireContext())) {
+            val timeStamp = KotlinUtils.generateTimeStamp()
+            val method = "GET"
+            val path = "/orders/leverage"
+            val queryString = "?product_id=" + appPreferenceManager!!.currentProductId!!
+            val payload = ""
+            val signatureData = method + timeStamp + path + queryString + payload
+            Log.d(logTag, signatureData)
+            val signature = KotlinUtils.generateSignature(
+                signatureData,
+                appPreferenceManager!!.apiSecret!!
+            )
+
+            val observe = service!!.getOrderLeverage(
+                appPreferenceManager!!.apiKey!!,
+                timeStamp,
+                signature!!,
+                appPreferenceManager!!.currentProductId!!
+            )
+            observe.enqueue(object :
+                Callback<ResponseBody?> {
+                override fun onResponse(
+                    call: Call<ResponseBody?>?,
+                    response: Response<ResponseBody?>
+                ) {
+                    if (response.code() == 200) {
+                        val orderLeverageResponse = Gson().fromJson(
+                            response.body()!!.charStream(),
+                            OrderLeverageResponse::class.java
+                        )
+                        when {
+                            orderLeverageResponse.leverage.toDouble() == 1.0 -> {
+                                leverageSeeker.setProgress(0f)
+                            }
+                            orderLeverageResponse.leverage.toDouble() == 2.0 -> {
+                                leverageSeeker.setProgress(14f)
+                            }
+                            orderLeverageResponse.leverage.toDouble() == 3.0 -> {
+                                leverageSeeker.setProgress(29f)
+                            }
+                            orderLeverageResponse.leverage.toDouble() == 5.0 -> {
+                                leverageSeeker.setProgress(43f)
+                            }
+                            orderLeverageResponse.leverage.toDouble() == 10.0 -> {
+                                leverageSeeker.setProgress(57f)
+                            }
+                            orderLeverageResponse.leverage.toDouble() == 25.0 -> {
+                                leverageSeeker.setProgress(71f)
+                            }
+                            orderLeverageResponse.leverage.toDouble() == 50.0 -> {
+                                leverageSeeker.setProgress(86f)
+                            }
+                            orderLeverageResponse.leverage.toDouble() == 100.0 -> {
+                                leverageSeeker.setProgress(100f)
+                            }
+                        }
+
+                        leverageTxt.text =
+                            orderLeverageResponse.leverage.toDouble().toInt().toString().plus("x")
+                        leverageChangedByUser = true
+                        Toasty.success(
+                            requireContext(),
+                            requireContext().getString(R.string.order_leverage_changed_successfully),
+                            Toast.LENGTH_SHORT,
+                            true
+                        ).show()
+                    } else {
+                        val errorBody = Gson().fromJson(
+                            response.errorBody()!!.charStream(),
+                            ErrorResponse::class.java
+                        )
+                        Toasty.error(
+                            requireContext(),
+                            errorBody.message,
+                            Toast.LENGTH_SHORT,
+                            true
+                        ).show()
+                    }
                     progressBar.dismiss()
                 }
 
-                override fun onNext(responseData: OrderLeverageResponse) {
-                    Log.d(logTag, responseData.leverage)
-                    when {
-                        responseData.leverage.toDouble() == 1.0 -> {
-                            leverageSeeker.setProgress(0f)
-                        }
-                        responseData.leverage.toDouble() == 2.0 -> {
-                            leverageSeeker.setProgress(14f)
-                        }
-                        responseData.leverage.toDouble() == 3.0 -> {
-                            leverageSeeker.setProgress(29f)
-                        }
-                        responseData.leverage.toDouble() == 5.0 -> {
-                            leverageSeeker.setProgress(43f)
-                        }
-                        responseData.leverage.toDouble() == 10.0 -> {
-                            leverageSeeker.setProgress(57f)
-                        }
-                        responseData.leverage.toDouble() == 25.0 -> {
-                            leverageSeeker.setProgress(71f)
-                        }
-                        responseData.leverage.toDouble() == 50.0 -> {
-                            leverageSeeker.setProgress(86f)
-                        }
-                        responseData.leverage.toDouble() == 100.0 -> {
-                            leverageSeeker.setProgress(100f)
-                        }
-                    }
-
-                    leverageTxt.text =
-                        responseData.leverage.toDouble().toInt().toString().plus("x")
-                    leverageChangedByUser = true
-                }
-
-                override fun onError(error: Throwable) {
+                override fun onFailure(call: Call<ResponseBody?>?, error: Throwable?) {
                     when (error) {
                         is NoConnectivityException -> {
                             Toasty.info(
@@ -245,15 +267,22 @@ class OrderFragment : BaseFragment() {
                                 Toast.LENGTH_SHORT,
                                 true
                             ).show()
-                            error.printStackTrace()
+                            error!!.printStackTrace()
                         }
                     }
-                    error.printStackTrace()
                     progressBar.dismiss()
                     leverageChangedByUser = true
                 }
-            }).addTo(disposables)
-
+            })
+        } else {
+            progressBar.dismiss()
+            Toasty.warning(
+                requireContext(),
+                requireContext().getString(R.string.api_details_error),
+                Toast.LENGTH_SHORT,
+                true
+            ).show()
+        }
 
         orderTypeRadioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
@@ -270,29 +299,31 @@ class OrderFragment : BaseFragment() {
             }
         }
 
-        buyAndSellSwitch.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                buyAndSellSwitch.text =
-                    requireContext().resources.getString(R.string.sell_short)
-                buyAndSellSwitch.setTextColor(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.colorAsk
+        if (KotlinUtils.apiDetailsPresent(requireContext())) {
+            buyAndSellSwitch.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    buyAndSellSwitch.text =
+                        requireContext().resources.getString(R.string.sell_short)
+                    buyAndSellSwitch.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.colorAsk
+                        )
                     )
-                )
-                btnPlaceOrder.backgroundTintList =
-                    ContextCompat.getColorStateList(requireContext(), R.color.colorAsk)
-            } else {
-                buyAndSellSwitch.text =
-                    requireContext().resources.getString(R.string.buy_long)
-                buyAndSellSwitch.setTextColor(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.colorBid
+                    btnPlaceOrder.backgroundTintList =
+                        ContextCompat.getColorStateList(requireContext(), R.color.colorAsk)
+                } else {
+                    buyAndSellSwitch.text =
+                        requireContext().resources.getString(R.string.buy_long)
+                    buyAndSellSwitch.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.colorBid
+                        )
                     )
-                )
-                btnPlaceOrder.backgroundTintList =
-                    ContextCompat.getColorStateList(requireContext(), R.color.colorBid)
+                    btnPlaceOrder.backgroundTintList =
+                        ContextCompat.getColorStateList(requireContext(), R.color.colorBid)
+                }
             }
         }
 
@@ -347,7 +378,6 @@ class OrderFragment : BaseFragment() {
                         gson.toJson(changeOrderLeverageBody).toString()
                     val signatureDataSetOrderLeverage =
                         methodSetOrderLeverage + timeStampSetOrderLeverage + pathSetOrderLeverage + queryStringSetOrderLeverage + payloadSetOrderLeverage
-                    Log.d(logTag, signatureData)
                     val signatureSetOrderLeverage = KotlinUtils.generateSignature(
                         signatureDataSetOrderLeverage,
                         appPreferenceManager!!.apiSecret!!
@@ -360,59 +390,81 @@ class OrderFragment : BaseFragment() {
                         signatureSetOrderLeverage!!,
                         changeOrderLeverageBody
                     )
-                    observeOrderLeverage.subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeWith(object :
-                            DisposableObserver<OrderLeverageResponse>() {
-                            override fun onComplete() {
-                                Log.d("getOrderLeverage", "onComplete")
-                                progressBar.dismiss()
-                            }
 
-                            override fun onNext(responseData: OrderLeverageResponse) {
-                                Log.d(logTag, responseData.leverage)
+                    observeOrderLeverage.enqueue(object :
+                        Callback<ResponseBody?> {
+                        override fun onResponse(
+                            call: Call<ResponseBody?>?,
+                            response: Response<ResponseBody?>
+                        ) {
+                            if (response.code() == 200) {
+                                Toasty.success(
+                                    requireContext(),
+                                    requireContext().getString(R.string.order_leverage_changed_successfully),
+                                    Toast.LENGTH_SHORT,
+                                    true
+                                ).show()
+                            } else {
+                                val errorBody = Gson().fromJson(
+                                    response.errorBody()!!.charStream(),
+                                    ErrorResponse::class.java
+                                )
+                                Toasty.error(
+                                    requireContext(),
+                                    errorBody.message,
+                                    Toast.LENGTH_SHORT,
+                                    true
+                                ).show()
                             }
+                            progressBar.dismiss()
+                        }
 
-                            override fun onError(error: Throwable) {
-                                when (error) {
-                                    is NoConnectivityException -> {
-                                        Toasty.info(
-                                            requireContext(),
-                                            requireContext().getString(R.string.active_network_connection_required),
-                                            Toast.LENGTH_SHORT,
-                                            true
-                                        ).show()
-                                    }
-                                    is ConnectException -> {
-                                        Toasty.error(
-                                            requireContext(),
-                                            requireContext().getString(R.string.server_not_responding),
-                                            Toast.LENGTH_SHORT,
-                                            true
-                                        ).show()
-                                    }
-                                    is SocketTimeoutException -> {
-                                        Toasty.error(
-                                            requireContext(),
-                                            requireContext().getString(R.string.connection_timeout),
-                                            Toast.LENGTH_SHORT,
-                                            true
-                                        ).show()
-                                    }
-                                    else -> {
-                                        Toasty.error(
-                                            requireContext(),
-                                            requireContext().getString(R.string.something_wrong),
-                                            Toast.LENGTH_SHORT,
-                                            true
-                                        ).show()
-                                        error.printStackTrace()
-                                    }
+                        override fun onFailure(call: Call<ResponseBody?>?, error: Throwable?) {
+                            when (error) {
+                                is NoConnectivityException -> {
+                                    Toasty.info(
+                                        requireContext(),
+                                        requireContext().getString(R.string.active_network_connection_required),
+                                        Toast.LENGTH_SHORT,
+                                        true
+                                    ).show()
                                 }
-                                error.printStackTrace()
-                                progressBar.dismiss()
+                                is ConnectException -> {
+                                    Toasty.error(
+                                        requireContext(),
+                                        requireContext().getString(R.string.server_not_responding),
+                                        Toast.LENGTH_SHORT,
+                                        true
+                                    ).show()
+                                }
+                                is SocketTimeoutException -> {
+                                    Toasty.error(
+                                        requireContext(),
+                                        requireContext().getString(R.string.connection_timeout),
+                                        Toast.LENGTH_SHORT,
+                                        true
+                                    ).show()
+                                }
+                                else -> {
+                                    Toasty.error(
+                                        requireContext(),
+                                        requireContext().getString(R.string.something_wrong),
+                                        Toast.LENGTH_SHORT,
+                                        true
+                                    ).show()
+                                    error!!.printStackTrace()
+                                }
                             }
-                        }).addTo(disposables)
+                            progressBar.dismiss()
+                        }
+                    })
+                } else {
+                    Toasty.error(
+                        requireContext(),
+                        requireContext().getString(R.string.api_details_error),
+                        Toast.LENGTH_SHORT,
+                        true
+                    ).show()
                 }
             }
 
@@ -608,60 +660,71 @@ class OrderFragment : BaseFragment() {
                 signature!!,
                 createOrderRequest
             )
-            observe.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : DisposableObserver<CreateOrderResponse>() {
-                    override fun onComplete() {
-                        Log.d("placeOrder", "onComplete")
-                    }
-
-                    override fun onNext(responseData: CreateOrderResponse) {
+            observe.enqueue(object :
+                Callback<ResponseBody?> {
+                override fun onResponse(
+                    call: Call<ResponseBody?>?,
+                    response: Response<ResponseBody?>
+                ) {
+                    if (response.code() == 200) {
                         Toasty.success(
                             requireContext(),
-                            responseData.orderType!!.replace("_", "").plus(" successfully placed"),
+                            requireContext().getString(R.string.order_placed_successfully),
+                            Toast.LENGTH_SHORT,
+                            true
+                        ).show()
+                    } else {
+                        val errorBody = Gson().fromJson(
+                            response.errorBody()!!.charStream(),
+                            ErrorResponse::class.java
+                        )
+                        Toasty.error(
+                            requireContext(),
+                            errorBody.message,
                             Toast.LENGTH_SHORT,
                             true
                         ).show()
                     }
+                }
 
-                    override fun onError(error: Throwable) {
-                        when (error) {
-                            is NoConnectivityException -> {
-                                Toasty.info(
-                                    requireContext(),
-                                    requireContext().getString(R.string.active_network_connection_required),
-                                    Toast.LENGTH_SHORT,
-                                    true
-                                ).show()
-                            }
-                            is ConnectException -> {
-                                Toasty.error(
-                                    requireContext(),
-                                    requireContext().getString(R.string.server_not_responding),
-                                    Toast.LENGTH_SHORT,
-                                    true
-                                ).show()
-                            }
-                            is SocketTimeoutException -> {
-                                Toasty.error(
-                                    requireContext(),
-                                    requireContext().getString(R.string.connection_timeout),
-                                    Toast.LENGTH_SHORT,
-                                    true
-                                ).show()
-                            }
-                            else -> {
-                                Toasty.error(
-                                    requireContext(),
-                                    requireContext().getString(R.string.something_wrong),
-                                    Toast.LENGTH_SHORT,
-                                    true
-                                ).show()
-                            }
+                override fun onFailure(call: Call<ResponseBody?>?, error: Throwable?) {
+                    when (error) {
+                        is NoConnectivityException -> {
+                            Toasty.info(
+                                requireContext(),
+                                requireContext().getString(R.string.active_network_connection_required),
+                                Toast.LENGTH_SHORT,
+                                true
+                            ).show()
                         }
-                        error.printStackTrace()
+                        is ConnectException -> {
+                            Toasty.error(
+                                requireContext(),
+                                requireContext().getString(R.string.server_not_responding),
+                                Toast.LENGTH_SHORT,
+                                true
+                            ).show()
+                        }
+                        is SocketTimeoutException -> {
+                            Toasty.error(
+                                requireContext(),
+                                requireContext().getString(R.string.connection_timeout),
+                                Toast.LENGTH_SHORT,
+                                true
+                            ).show()
+                        }
+                        else -> {
+                            Toasty.error(
+                                requireContext(),
+                                requireContext().getString(R.string.something_wrong),
+                                Toast.LENGTH_SHORT,
+                                true
+                            ).show()
+                            error!!.printStackTrace()
+                        }
                     }
-                }).addTo(disposables)
+                }
+            })
         }
         withContext(Dispatchers.Main) {
             dialog.dismiss()

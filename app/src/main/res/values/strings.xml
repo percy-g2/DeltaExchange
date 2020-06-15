@@ -78,4 +78,8 @@
     <string name="chart_resolution_preference">chart_resolution_preference</string>
     <string name="product_id_preference">product_id_preference</string>
     <string name="product_symbol_preference">product_symbol_preference</string>
+    <string name="order_placed_successfully">Order placed successfully</string>
+    <string name="order_leverage_changed_successfully">Order leverage changed successfully</string>
+    <string name="api_details_error">Check your API details</string>
+    <string name="volumeTxt">Volume</string>
 </resources>

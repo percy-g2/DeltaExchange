@@ -51,30 +51,37 @@ class PositionsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun loadOrders() {
         chartProgressSpinner!!.visibility = View.VISIBLE
-        val timeStamp = KotlinUtils.generateTimeStamp()
-        val method = "GET"
-        val path = "/positions"
-        val queryString = ""
-        val payload = ""
-        val signatureData = method + timeStamp + path + queryString + payload
+        if (KotlinUtils.apiDetailsPresent(requireContext())) {
+            val timeStamp = KotlinUtils.generateTimeStamp()
+            val method = "GET"
+            val path = "/positions"
+            val queryString = ""
+            val payload = ""
+            val signatureData = method + timeStamp + path + queryString + payload
 
-        val signature = KotlinUtils.generateSignature(
-            signatureData,
-            appPreferenceManager!!.apiSecret!!
-        )
+            val signature = KotlinUtils.generateSignature(
+                signatureData,
+                appPreferenceManager!!.apiSecret!!
+            )
 
-        positionViewModel.getOpenPositions(
-            appPreferenceManager!!.apiKey!!,
-            timeStamp,
-            signature!!
-        )!!.observe(viewLifecycleOwner, Observer {
-            if (it != null) {
-                openOrdersRecyclerView.adapter = PositionAdapter(it)
-            }
+            positionViewModel.getOpenPositions(
+                appPreferenceManager!!.apiKey!!,
+                timeStamp,
+                signature!!
+            )!!.observe(viewLifecycleOwner, Observer {
+                if (it != null) {
+                    openOrdersRecyclerView.adapter = PositionAdapter(it)
+                }
+                chartProgressSpinner!!.visibility = View.GONE
+                if (swipeLayout.isRefreshing) {
+                    swipeLayout.isRefreshing = false
+                }
+            })
+        } else {
             chartProgressSpinner!!.visibility = View.GONE
             if (swipeLayout.isRefreshing) {
                 swipeLayout.isRefreshing = false
             }
-        })
+        }
     }
 }

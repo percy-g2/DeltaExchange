@@ -38,8 +38,8 @@ android {
         }
         debug {
             versionNameSuffix '-debug'
-            minifyEnabled false
-            shrinkResources false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         android.applicationVariants.all { variant ->
@@ -106,6 +106,8 @@ dependencies {
     implementation 'com.github.GrenderG:Toasty:1.4.2'
 
     implementation "androidx.security:security-crypto:1.0.0-rc02"
+
+    implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.8'
 
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'

@@ -53,8 +53,6 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:textColor="@color/primaryTextColor"
-                android:textSize="18sp"
-                android:textStyle="bold"
                 tools:text="7.0M USD" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 

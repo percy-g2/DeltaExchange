@@ -6,10 +6,10 @@ import crypto.delta.exchange.openexchange.pojo.OrderBookResponse
 import crypto.delta.exchange.openexchange.pojo.order.ChangeOrderLeverageBody
 import crypto.delta.exchange.openexchange.pojo.order.CreateOrderRequest
 import crypto.delta.exchange.openexchange.pojo.order.CreateOrderResponse
-import crypto.delta.exchange.openexchange.pojo.order.OrderLeverageResponse
 import crypto.delta.exchange.openexchange.pojo.position.OpenPositionResponse
 import crypto.delta.exchange.openexchange.pojo.products.ProductsResponse
 import io.reactivex.Observable
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -42,7 +42,7 @@ interface DeltaExchangeApiEndPoints {
         @Header("timestamp") timestamp: String,
         @Header("signature") signature: String,
         @Body createOrderRequest: CreateOrderRequest
-    ): Observable<CreateOrderResponse>
+    ): Call<ResponseBody>
 
     @GET("/orders/leverage")
     fun getOrderLeverage(
@@ -50,7 +50,7 @@ interface DeltaExchangeApiEndPoints {
         @Header("timestamp") timestamp: String,
         @Header("signature") signature: String,
         @Query("product_id") productId: String?
-    ): Observable<OrderLeverageResponse>
+    ): Call<ResponseBody>
 
     @POST("/orders/leverage")
     fun setOrderLeverage(
@@ -58,7 +58,7 @@ interface DeltaExchangeApiEndPoints {
         @Header("timestamp") timestamp: String,
         @Header("signature") signature: String,
         @Body changeOrderLeverageBody: ChangeOrderLeverageBody
-    ): Observable<OrderLeverageResponse>
+    ): Call<ResponseBody>
 
     @GET("/orders")
     fun getOrders(

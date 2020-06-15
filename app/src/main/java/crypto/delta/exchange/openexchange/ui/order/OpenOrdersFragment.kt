@@ -47,29 +47,38 @@ class OpenOrdersFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener 
 
     private fun loadOrders() {
         chartProgressSpinner!!.visibility = View.VISIBLE
-        val timeStamp = KotlinUtils.generateTimeStamp()
-        val method = "GET"
-        val path = "/orders"
-        val queryString = "?state=open"
-        val payload = ""
-        val signatureData = method + timeStamp + path + queryString + payload
+        if (KotlinUtils.apiDetailsPresent(requireContext())) {
+            val timeStamp = KotlinUtils.generateTimeStamp()
+            val method = "GET"
+            val path = "/orders"
+            val queryString = "?state=open"
+            val payload = ""
+            val signatureData = method + timeStamp + path + queryString + payload
 
-        val signature = KotlinUtils.generateSignature(
-            signatureData,
-            appPreferenceManager!!.apiSecret!!
-        )
+            val signature = KotlinUtils.generateSignature(
+                signatureData,
+                appPreferenceManager!!.apiSecret!!
+            )
 
-        openOrdersViewModel.getOrders(appPreferenceManager!!.apiKey!!,
-            timeStamp,
-            signature!!,
-            appPreferenceManager!!.currentProductId!!, "open")!!.observe(viewLifecycleOwner, Observer {
-            if (it != null) {
-                openOrdersRecyclerView.adapter = OpenOrdersAdapter(it)
-            }
+            openOrdersViewModel.getOrders(
+                appPreferenceManager!!.apiKey!!,
+                timeStamp,
+                signature!!,
+                appPreferenceManager!!.currentProductId!!, "open"
+            )!!.observe(viewLifecycleOwner, Observer {
+                if (it != null) {
+                    openOrdersRecyclerView.adapter = OpenOrdersAdapter(it)
+                }
+                chartProgressSpinner!!.visibility = View.GONE
+                if (swipeLayout.isRefreshing) {
+                    swipeLayout.isRefreshing = false
+                }
+            })
+        } else {
             chartProgressSpinner!!.visibility = View.GONE
             if (swipeLayout.isRefreshing) {
                 swipeLayout.isRefreshing = false
             }
-        })
+        }
     }
 }

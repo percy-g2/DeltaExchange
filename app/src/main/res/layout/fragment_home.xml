@@ -66,11 +66,59 @@
                 android:text="@string/usdt_settled" />
         </com.google.android.material.tabs.TabLayout>
 
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight=".5"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/symbol"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/outline_box"
+                android:gravity="center"
+                android:text="@string/contract"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:textAllCaps="true" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/lastPrice"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/outline_box"
+                android:gravity="center"
+                android:text="@string/price"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:textAllCaps="true" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/dayVolume"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/outline_box"
+                android:gravity="center"
+                android:text="@string/volumeTxt"
+                android:textAllCaps="true"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipeLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="8.8">
+            android:layout_weight="8.3">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/homeRecyclerView"

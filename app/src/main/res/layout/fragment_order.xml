@@ -105,7 +105,7 @@
                 android:background="@drawable/outline_box"
                 android:hint="@string/Quantity"
                 android:imeOptions="actionDone|flagNoExtractUi"
-                android:inputType="numberDecimal"
+                android:inputType="number"
                 android:textColor="@color/primaryTextColor"
                 android:textColorHint="@color/primaryTextColor"
                 android:textCursorDrawable="@null" />
