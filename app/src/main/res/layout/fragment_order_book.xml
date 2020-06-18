@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".ui.order.OrderBookFragment">
 
@@ -54,11 +55,16 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <ProgressBar
+    <crypto.delta.exchange.openexchange.utils.BlinkingLoader
         android:id="@+id/progressSpinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="8dp"
-        android:indeterminate="true" />
+        android:indeterminate="true"
+        app:auto_start="true"
+        app:dot_blinkingColor="@color/colorBid"
+        app:dot_margin="3dp"
+        app:dot_neutralColor="@color/primaryTextColor"
+        app:dot_num_dots="5" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

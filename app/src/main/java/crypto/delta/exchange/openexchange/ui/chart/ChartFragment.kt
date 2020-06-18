@@ -129,7 +129,7 @@ class ChartFragment : BaseFragment() {
     }
 
     private fun loadChart(resolution: String) {
-        chartProgressSpinner!!.visibility = View.VISIBLE
+        progressSpinner!!.visibility = View.VISIBLE
         val currentTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
         chartViewModel.getChartHistory(
             resolution,
@@ -184,7 +184,7 @@ class ChartFragment : BaseFragment() {
                 e.printStackTrace()
                 requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             }
-            chartProgressSpinner!!.visibility = View.GONE
+            progressSpinner!!.visibility = View.GONE
         })
     }
 }

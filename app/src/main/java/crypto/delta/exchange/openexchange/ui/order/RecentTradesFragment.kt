@@ -43,7 +43,7 @@ class RecentTradesFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListene
                 recentTradesList = it.recentTrades!!
                 list.adapter = RecentTradesAdapter(recentTradesList!!, requireContext())
             }
-            chartProgressSpinner!!.visibility = View.GONE
+            progressSpinner!!.visibility = View.GONE
             if (swipeLayout.isRefreshing) {
                 swipeLayout.isRefreshing = false
             }
@@ -57,13 +57,13 @@ class RecentTradesFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListene
     private fun loadRecyclerViewData() {
         recentTradesList!!.clear()
         recentTradesViewModel.getOrderBook(appPreferenceManager!!.currentProductId!!)!!.removeObservers(viewLifecycleOwner)
-        chartProgressSpinner!!.visibility = View.VISIBLE
+        progressSpinner!!.visibility = View.VISIBLE
         recentTradesViewModel.getOrderBook(appPreferenceManager!!.currentProductId!!)!!.observe(viewLifecycleOwner, Observer {
             if (it != null) {
                 recentTradesList = it.recentTrades!!
                 list.adapter = RecentTradesAdapter(recentTradesList!!, requireContext())
             }
-            chartProgressSpinner!!.visibility = View.GONE
+            progressSpinner!!.visibility = View.GONE
             if (swipeLayout.isRefreshing) {
                 swipeLayout.isRefreshing = false
             }

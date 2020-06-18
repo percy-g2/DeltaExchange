@@ -180,6 +180,29 @@ class OrderFragment : BaseFragment() {
                             Toast.LENGTH_SHORT,
                             true
                         ).show()
+                        if (buyAndSellSwitch.isChecked) {
+                            buyAndSellSwitch.text =
+                                requireContext().resources.getString(R.string.sell_short)
+                            buyAndSellSwitch.setTextColor(
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    R.color.colorAsk
+                                )
+                            )
+                            btnPlaceOrder.backgroundTintList =
+                                ContextCompat.getColorStateList(requireContext(), R.color.colorAsk)
+                        } else {
+                            buyAndSellSwitch.text =
+                                requireContext().resources.getString(R.string.buy_long)
+                            buyAndSellSwitch.setTextColor(
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    R.color.colorBid
+                                )
+                            )
+                            btnPlaceOrder.backgroundTintList =
+                                ContextCompat.getColorStateList(requireContext(), R.color.colorBid)
+                        }
                     } else {
                         val errorBody = Gson().fromJson(
                             response.errorBody()!!.charStream(),
@@ -191,6 +214,8 @@ class OrderFragment : BaseFragment() {
                             Toast.LENGTH_SHORT,
                             true
                         ).show()
+                        btnPlaceOrder.backgroundTintList =
+                            ContextCompat.getColorStateList(requireContext(), R.color.gray)
                     }
                     progressBar.dismiss()
                 }
@@ -231,6 +256,8 @@ class OrderFragment : BaseFragment() {
                             error!!.printStackTrace()
                         }
                     }
+                    btnPlaceOrder.backgroundTintList =
+                        ContextCompat.getColorStateList(requireContext(), R.color.gray)
                     progressBar.dismiss()
                     leverageChangedByUser = true
                 }

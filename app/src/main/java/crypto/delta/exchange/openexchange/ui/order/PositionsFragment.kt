@@ -50,7 +50,7 @@ class PositionsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun loadOrders() {
-        chartProgressSpinner!!.visibility = View.VISIBLE
+        progressSpinner!!.visibility = View.VISIBLE
         if (KotlinUtils.apiDetailsPresent(requireContext())) {
             val timeStamp = KotlinUtils.generateTimeStamp()
             val method = "GET"
@@ -72,13 +72,13 @@ class PositionsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                 if (it != null) {
                     openOrdersRecyclerView.adapter = PositionAdapter(it)
                 }
-                chartProgressSpinner!!.visibility = View.GONE
+                progressSpinner!!.visibility = View.GONE
                 if (swipeLayout.isRefreshing) {
                     swipeLayout.isRefreshing = false
                 }
             })
         } else {
-            chartProgressSpinner!!.visibility = View.GONE
+            progressSpinner!!.visibility = View.GONE
             if (swipeLayout.isRefreshing) {
                 swipeLayout.isRefreshing = false
             }
