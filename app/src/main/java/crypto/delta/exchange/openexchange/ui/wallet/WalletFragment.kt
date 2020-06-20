@@ -18,7 +18,7 @@ import crypto.delta.exchange.openexchange.pojo.WalletResponse
 import crypto.delta.exchange.openexchange.ui.base.BaseFragment
 import crypto.delta.exchange.openexchange.utils.KotlinUtils
 import es.dmoral.toasty.Toasty
-import kotlinx.android.synthetic.main.fragment_account.*
+import kotlinx.android.synthetic.main.fragment_wallet.*
 
 
 class WalletFragment : BaseFragment() {
@@ -33,7 +33,7 @@ class WalletFragment : BaseFragment() {
     ): View? {
         walletViewModel = ViewModelProvider(this@WalletFragment).get(WalletViewModel::class.java)
         walletViewModel.init()
-        return inflater.inflate(R.layout.fragment_account, container, false)
+        return inflater.inflate(R.layout.fragment_wallet, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

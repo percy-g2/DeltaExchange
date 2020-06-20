@@ -36,9 +36,21 @@ class CreateOrderRequest {
     @Expose
     var reduceOnly: String? = null
 
-    @SerializedName("bracket_order")
+    @SerializedName("stop_price")
     @Expose
-    var bracketOrder: BracketOrder? = null
+    var stopPrice: String? = null
+
+    @SerializedName("trail_amount")
+    @Expose
+    var trailAmount: String? = null
+
+    @SerializedName("stop_order_type")
+    @Expose
+    var stopOrderType: String? = null
+
+    @SerializedName("close_on_trigger")
+    @Expose
+    var closeOnTrigger: String? = null
 
     enum class OrderType {
         limit_order, market_order

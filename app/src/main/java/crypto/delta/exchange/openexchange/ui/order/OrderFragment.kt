@@ -671,8 +671,11 @@ class OrderFragment : BaseFragment() {
                         }
                     }
                 } else if (orderTypeSpinner.selectedItem.toString().equals("Stop Market", true)) {
-                    if (edtQuantity.text!!.isNotEmpty()) {
-                        if (edtQuantity.text!!.toString().toDouble() != 0.0) {
+                    if (edtLimitStopPrice.text!!.isNotEmpty() && edtQuantity.text!!.isNotEmpty()) {
+                        if (edtLimitStopPrice.text!!.toString()
+                                .toDouble() != 0.0 && edtQuantity.text!!.toString()
+                                .toDouble() != 0.0
+                        ) {
                             val createOrderRequest = CreateOrderRequest()
                             createOrderRequest.orderType =
                                 CreateOrderRequest.OrderType.market_order
@@ -683,7 +686,10 @@ class OrderFragment : BaseFragment() {
                             }
                             createOrderRequest.productId =
                                 appPreferenceManager!!.currentProductId!!.toInt()
+                            createOrderRequest.stopPrice = edtLimitStopPrice.text.toString()
                             createOrderRequest.size = edtQuantity.text.toString().toInt()
+                            createOrderRequest.closeOnTrigger = "false"
+                            createOrderRequest.stopOrderType = "stop_loss_order"
                             if (checkReduceOnly.isChecked) {
                                 createOrderRequest.reduceOnly = "true"
                             } else {
@@ -693,6 +699,14 @@ class OrderFragment : BaseFragment() {
                                 placeOrder(createOrderRequest)
                             }
                         } else {
+                            if (edtLimitStopPrice.text.toString().toDouble() == 0.0) {
+                                Toasty.error(
+                                    requireContext(),
+                                    requireContext().getString(R.string.limit_price_is_zero),
+                                    Toast.LENGTH_SHORT,
+                                    true
+                                ).show()
+                            }
                             if (edtQuantity.text.toString().toDouble() == 0.0) {
                                 Toasty.error(
                                     requireContext(),
@@ -703,6 +717,14 @@ class OrderFragment : BaseFragment() {
                             }
                         }
                     } else {
+                        if (edtLimitStopPrice.text.isNullOrEmpty()) {
+                            Toasty.error(
+                                requireContext(),
+                                requireContext().getString(R.string.limit_price_is_empty),
+                                Toast.LENGTH_SHORT,
+                                true
+                            ).show()
+                        }
                         if (edtQuantity.text.isNullOrEmpty()) {
                             Toasty.error(
                                 requireContext(),

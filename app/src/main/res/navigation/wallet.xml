@@ -8,5 +8,5 @@
         android:id="@+id/navigation_wallet"
         android:name="crypto.delta.exchange.openexchange.ui.wallet.WalletFragment"
         android:label="@string/title_account"
-        tools:layout="@layout/fragment_account" />
+        tools:layout="@layout/fragment_wallet" />
 </navigation>
