@@ -98,4 +98,5 @@
     <string name="title_wallet">Wallet</string>
     <string name="stop_price">Stop Price</string>
     <string name="trailing_amount">Trailing Amount</string>
+    <string name="version">"Version:  "</string>
 </resources>

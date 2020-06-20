@@ -1,6 +1,7 @@
 package crypto.delta.exchange.openexchange.utils
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.util.Log
 import android.util.TypedValue
 import android.widget.LinearLayout
@@ -86,5 +87,20 @@ object KotlinUtils {
     fun apiDetailsPresent(context: Context): Boolean {
         val appPreferenceManager = AppPreferenceManager(context)
         return !(appPreferenceManager.apiKey!!.isEmpty() || appPreferenceManager.apiSecret!!.isEmpty())
+    }
+
+    /**
+     * Get current application version.
+     */
+    fun getAppVersion(context: Context): String? {
+        var strVersion: String? = null
+        val manager = context.packageManager
+        try {
+            val info = manager.getPackageInfo(context.packageName, 0)
+            strVersion = info.versionName
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+        }
+        return strVersion
     }
 }
