@@ -105,7 +105,7 @@ dependencies {
 
     implementation 'com.github.GrenderG:Toasty:1.4.2'
 
-    implementation "androidx.security:security-crypto:1.0.0-rc02"
+    implementation "androidx.security:security-crypto:1.1.0-alpha01"
 
     implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.8'
 
