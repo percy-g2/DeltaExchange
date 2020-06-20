@@ -5,17 +5,18 @@
         android:id="@+id/home"
         android:icon="@drawable/ic_baseline_home_24"
         android:title="@string/title_home" />
-
-    <item
-        android:id="@+id/order"
-        android:icon="@drawable/ic_description_black_24dp"
-        android:title="@string/title_order" />
-
     <item
         android:id="@+id/chart"
         android:icon="@drawable/ic_timeline_black_24dp"
         android:title="@string/title_chart" />
-
+    <item
+        android:id="@+id/order"
+        android:icon="@drawable/ic_description_black_24dp"
+        android:title="@string/title_order" />
+    <item
+        android:id="@+id/wallet"
+        android:icon="@drawable/ic_baseline_account_balance_wallet_24"
+        android:title="@string/title_wallet" />
     <item
         android:id="@+id/settings"
         android:icon="@drawable/ic_baseline_settings_24"

@@ -1,7 +1,6 @@
 package crypto.delta.exchange.openexchange.ui.chart
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import crypto.delta.exchange.openexchange.BaseViewModel
@@ -12,7 +11,7 @@ class ChartViewModel(application: Application) : BaseViewModel(application) {
     private var mutableLiveData: MutableLiveData<DeltaExchangeChartHistoryResponse?>? = null
     private var deltaRepository: DeltaRepository? = null
 
-    fun init(context: Context) {
+    fun init() {
         if (mutableLiveData != null) {
             return
         }

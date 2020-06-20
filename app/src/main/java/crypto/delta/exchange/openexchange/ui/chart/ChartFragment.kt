@@ -29,7 +29,7 @@ class ChartFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View? {
         chartViewModel = ViewModelProvider(this).get(ChartViewModel::class.java)
-        chartViewModel.init(requireContext())
+        chartViewModel.init()
         return inflater.inflate(R.layout.fragment_chart, container, false)
     }
 

@@ -15,6 +15,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableObserver
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -169,7 +170,7 @@ class DeltaRepository(application: Application) : BaseViewModel(application) {
 
     fun getProductsData(symbol: String): MutableLiveData<DeltaExchangeTickerResponse>? {
         val data: MutableLiveData<DeltaExchangeTickerResponse> =
-            MutableLiveData<DeltaExchangeTickerResponse>()
+            MutableLiveData()
         deltaExchangeApiEndPoints!!.getTickers24Hrs(symbol)
             .enqueue(object :
                 Callback<DeltaExchangeTickerResponse?> {
@@ -185,6 +186,31 @@ class DeltaRepository(application: Application) : BaseViewModel(application) {
                 }
 
                 override fun onFailure(call: Call<DeltaExchangeTickerResponse?>?, t: Throwable?) {
+                    data.value = null
+                }
+            })
+        return data
+    }
+
+    fun getWallet(
+        apiKey: String,
+        timestamp: String,
+        signature: String
+    ): MutableLiveData<Response<ResponseBody?>>? {
+        val data: MutableLiveData<Response<ResponseBody?>> =
+            MutableLiveData()
+        deltaExchangeApiEndPoints!!.getWallet(apiKey, timestamp, signature)
+            .enqueue(object :
+                Callback<ResponseBody?> {
+                override fun onResponse(
+                    call: Call<ResponseBody?>?,
+                    response: Response<ResponseBody?>
+                ) {
+
+                    data.value = response
+                }
+
+                override fun onFailure(call: Call<ResponseBody?>?, t: Throwable?) {
                     data.value = null
                 }
             })

@@ -74,4 +74,12 @@ interface DeltaExchangeApiEndPoints {
         @Header("timestamp") timestamp: String,
         @Header("signature") signature: String
     ): Call<List<OpenPositionResponse>>
+
+
+    @GET("/wallet/balances")
+    fun getWallet(
+        @Header("api-key") apiKey: String,
+        @Header("timestamp") timestamp: String,
+        @Header("signature") signature: String
+    ): Call<ResponseBody>
 }

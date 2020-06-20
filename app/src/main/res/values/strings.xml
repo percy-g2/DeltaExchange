@@ -84,4 +84,11 @@
     <string name="volumeTxt">Volume</string>
     <string name="order_book">Order Book</string>
     <string name="recent_trade">Recent Trade</string>
+    <string name="title_account">Account</string>
+    <string name="coin">coin</string>
+    <string name="position_margin">Position M.</string>
+    <string name="balance">balance</string>
+    <string name="order_margin">Order M.</string>
+    <string name="available_balance">Avail. Balance</string>
+    <string name="title_wallet">Wallet</string>
 </resources>
