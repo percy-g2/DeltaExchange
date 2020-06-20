@@ -40,6 +40,10 @@
     <string name="quantity_is_empty">Quantity is empty</string>
     <string name="limit_price_is_empty">Limit price is empty</string>
     <string name="limit_price_is_zero">Limit price can\'t be zero</string>
+    <string name="stop_price_is_empty">Stop price is empty</string>
+    <string name="stop_price_is_zero">Stop price can\'t be zero</string>
+    <string name="trailing_amount_is_empty">Trailing amount is empty</string>
+    <string name="trailing_amount_is_zero">Trailing amount can\'t be zero</string>
     <string name="quantity_is_zero">Quantity can\'t be zero</string>
     <string name="configure_api_key_first">Configure API key first</string>
     <string name="post_only_flag_is_for_gtc">Post only flag is for GTC</string>
@@ -80,6 +84,7 @@
     <string name="product_symbol_preference">product_symbol_preference</string>
     <string name="order_placed_successfully">Order placed successfully</string>
     <string name="order_leverage_changed_successfully">Order leverage changed successfully</string>
+    <string name="order_leverage_updated">Order leverage updated</string>
     <string name="api_details_error">Check your API details</string>
     <string name="volumeTxt">Volume</string>
     <string name="order_book">Order Book</string>
@@ -92,4 +97,5 @@
     <string name="available_balance">Avail. Balance</string>
     <string name="title_wallet">Wallet</string>
     <string name="stop_price">Stop Price</string>
+    <string name="trailing_amount">Trailing Amount</string>
 </resources>

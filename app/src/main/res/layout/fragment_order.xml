@@ -35,10 +35,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_gravity="center"
+                android:layout_margin="2dp"
                 android:layout_weight="1"
                 android:entries="@array/order_type"
                 android:gravity="center"
-                android:layout_margin="2dp"
                 android:popupTheme="@style/ThemeOverlay.MaterialComponents.Dark"
                 android:textAlignment="center"
                 android:theme="@style/ThemeOverlay.MaterialComponents.Dark" />
@@ -59,9 +59,25 @@
                 android:thumb="@drawable/thumb_selector"
                 app:track="@drawable/track_selector" />
 
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/edtStopPrice"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_gravity="center"
+                android:layout_margin="2dp"
+                android:layout_weight="1.2"
+                android:background="@drawable/outline_box"
+                android:gravity="center"
+                android:hint="@string/stop_price"
+                android:imeOptions="actionNext|flagNoExtractUi"
+                android:inputType="numberDecimal"
+                android:textColor="@color/primaryTextColor"
+                android:textColorHint="@color/primaryTextColor"
+                android:textCursorDrawable="@null"
+                android:visibility="gone" />
 
             <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/edtLimitStopPrice"
+                android:id="@+id/edtLimitPrice"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_gravity="center"
@@ -75,6 +91,7 @@
                 android:textColor="@color/primaryTextColor"
                 android:textColorHint="@color/primaryTextColor"
                 android:textCursorDrawable="@null" />
+
 
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/edtQuantity"

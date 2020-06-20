@@ -26,5 +26,7 @@
         <item>Limit</item>
         <item>Market</item>
         <item>Stop Market</item>
+        <item>Stop Limit</item>
+        <item>Trailing Stop</item>
     </string-array>
 </resources>
