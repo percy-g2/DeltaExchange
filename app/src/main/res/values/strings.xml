@@ -91,4 +91,5 @@
     <string name="order_margin">Order M.</string>
     <string name="available_balance">Avail. Balance</string>
     <string name="title_wallet">Wallet</string>
+    <string name="stop_price">Stop Price</string>
 </resources>

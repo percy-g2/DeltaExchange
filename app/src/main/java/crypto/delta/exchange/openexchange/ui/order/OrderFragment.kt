@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -282,18 +283,57 @@ class OrderFragment : BaseFragment() {
                 ).show()
             }
 
-            orderTypeRadioGroup.setOnCheckedChangeListener { _, checkedId ->
-                when (checkedId) {
-                    R.id.checkedLimit -> {
-                        edtLimitPrice.visibility = View.VISIBLE
-                        tifLayout.visibility = View.VISIBLE
-                        checkPostOnly.visibility = View.VISIBLE
+            orderTypeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                }
+
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    when (orderTypeSpinner.selectedItem.toString()) {
+                        "Limit" -> {
+                            edtLimitStopPrice.visibility = View.VISIBLE
+                            edtLimitStopPrice.hint = resources.getString(R.string.limit_price)
+                            tifLayout.visibility = View.VISIBLE
+                            checkPostOnly.visibility = View.VISIBLE
+                        }
+                        "Market" -> {
+                            edtLimitStopPrice.visibility = View.GONE
+                            tifLayout.visibility = View.GONE
+                            checkPostOnly.visibility = View.GONE
+                        }
+                        "Stop Market" -> {
+                            edtLimitStopPrice.visibility = View.VISIBLE
+                            edtLimitStopPrice.hint = resources.getString(R.string.stop_price)
+                            tifLayout.visibility = View.GONE
+                            checkPostOnly.visibility = View.GONE
+                        }
                     }
-                    R.id.checkedMarket -> {
-                        edtLimitPrice.visibility = View.GONE
-                        tifLayout.visibility = View.GONE
-                        checkPostOnly.visibility = View.GONE
-                    }
+                }
+
+            }
+
+            when (orderTypeSpinner.selectedItem.toString()) {
+                "Limit" -> {
+                    edtLimitStopPrice.visibility = View.VISIBLE
+                    edtLimitStopPrice.hint = resources.getString(R.string.limit_price)
+                    tifLayout.visibility = View.VISIBLE
+                    checkPostOnly.visibility = View.VISIBLE
+                }
+                "Market" -> {
+                    edtLimitStopPrice.visibility = View.GONE
+                    tifLayout.visibility = View.GONE
+                    checkPostOnly.visibility = View.GONE
+                }
+                "Stop Market" -> {
+                    edtLimitStopPrice.visibility = View.VISIBLE
+                    edtLimitStopPrice.hint = resources.getString(R.string.stop_price)
+                    tifLayout.visibility = View.GONE
+                    checkPostOnly.visibility = View.GONE
                 }
             }
 
@@ -507,9 +547,9 @@ class OrderFragment : BaseFragment() {
             }
 
             btnPlaceOrder.setOnClickListener {
-                if (checkedLimit.isChecked) {
-                    if (edtLimitPrice.text!!.isNotEmpty() && edtQuantity.text!!.isNotEmpty()) {
-                        if (edtLimitPrice.text!!.toString()
+                if (orderTypeSpinner.selectedItem.toString().equals("Limit", true)) {
+                    if (edtLimitStopPrice.text!!.isNotEmpty() && edtQuantity.text!!.isNotEmpty()) {
+                        if (edtLimitStopPrice.text!!.toString()
                                 .toDouble() != 0.0 && edtQuantity.text!!.toString()
                                 .toDouble() != 0.0
                         ) {
@@ -523,7 +563,7 @@ class OrderFragment : BaseFragment() {
                             }
                             createOrderRequest.productId =
                                 appPreferenceManager!!.currentProductId!!.toInt()
-                            createOrderRequest.limitPrice = edtLimitPrice.text.toString()
+                            createOrderRequest.limitPrice = edtLimitStopPrice.text.toString()
                             createOrderRequest.size = edtQuantity.text.toString().toInt()
                             when {
                                 checkedGTC.isChecked -> {
@@ -553,7 +593,7 @@ class OrderFragment : BaseFragment() {
                                 placeOrder(createOrderRequest)
                             }
                         } else {
-                            if (edtLimitPrice.text.toString().toDouble() == 0.0) {
+                            if (edtLimitStopPrice.text.toString().toDouble() == 0.0) {
                                 Toasty.error(
                                     requireContext(),
                                     requireContext().getString(R.string.limit_price_is_zero),
@@ -571,7 +611,7 @@ class OrderFragment : BaseFragment() {
                             }
                         }
                     } else {
-                        if (edtLimitPrice.text.isNullOrEmpty()) {
+                        if (edtLimitStopPrice.text.isNullOrEmpty()) {
                             Toasty.error(
                                 requireContext(),
                                 requireContext().getString(R.string.limit_price_is_empty),
@@ -588,7 +628,49 @@ class OrderFragment : BaseFragment() {
                             ).show()
                         }
                     }
-                } else if (checkedMarket.isChecked) {
+                } else if (orderTypeSpinner.selectedItem.toString().equals("Market", true)) {
+                    if (edtQuantity.text!!.isNotEmpty()) {
+                        if (edtQuantity.text!!.toString().toDouble() != 0.0) {
+                            val createOrderRequest = CreateOrderRequest()
+                            createOrderRequest.orderType =
+                                CreateOrderRequest.OrderType.market_order
+                            if (buyAndSellSwitch.isChecked) {
+                                createOrderRequest.side = CreateOrderRequest.Side.sell
+                            } else {
+                                createOrderRequest.side = CreateOrderRequest.Side.buy
+                            }
+                            createOrderRequest.productId =
+                                appPreferenceManager!!.currentProductId!!.toInt()
+                            createOrderRequest.size = edtQuantity.text.toString().toInt()
+                            if (checkReduceOnly.isChecked) {
+                                createOrderRequest.reduceOnly = "true"
+                            } else {
+                                createOrderRequest.reduceOnly = "false"
+                            }
+                            CoroutineScope(Dispatchers.Main).launch {
+                                placeOrder(createOrderRequest)
+                            }
+                        } else {
+                            if (edtQuantity.text.toString().toDouble() == 0.0) {
+                                Toasty.error(
+                                    requireContext(),
+                                    requireContext().getString(R.string.quantity_is_zero),
+                                    Toast.LENGTH_SHORT,
+                                    true
+                                ).show()
+                            }
+                        }
+                    } else {
+                        if (edtQuantity.text.isNullOrEmpty()) {
+                            Toasty.error(
+                                requireContext(),
+                                requireContext().getString(R.string.quantity_is_empty),
+                                Toast.LENGTH_SHORT,
+                                true
+                            ).show()
+                        }
+                    }
+                } else if (orderTypeSpinner.selectedItem.toString().equals("Stop Market", true)) {
                     if (edtQuantity.text!!.isNotEmpty()) {
                         if (edtQuantity.text!!.toString().toDouble() != 0.0) {
                             val createOrderRequest = CreateOrderRequest()

@@ -21,4 +21,10 @@
         <item>1 week</item>
         <item>2 weeks</item>
     </string-array>
+
+    <string-array name="order_type">
+        <item>Limit</item>
+        <item>Market</item>
+        <item>Stop Market</item>
+    </string-array>
 </resources>

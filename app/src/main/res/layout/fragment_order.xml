@@ -30,36 +30,18 @@
                 android:textStyle="bold"
                 tools:text="BTCUSD" />
 
-            <RadioGroup
-                android:id="@+id/orderTypeRadioGroup"
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/orderTypeSpinner"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_margin="2dp"
+                android:layout_gravity="center"
                 android:layout_weight="1"
-                android:checkedButton="@+id/checkedLimit"
-                android:orientation="horizontal"
-                android:weightSum="2">
-
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/checkedLimit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="@string/limit"
-                    android:textColor="@color/primaryTextColor"
-                    android:textSize="20sp" />
-
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/checkedMarket"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="@string/market"
-                    android:textColor="@color/primaryTextColor"
-                    android:textSize="20sp" />
-            </RadioGroup>
+                android:entries="@array/order_type"
+                android:gravity="center"
+                android:layout_margin="2dp"
+                android:popupTheme="@style/ThemeOverlay.MaterialComponents.Dark"
+                android:textAlignment="center"
+                android:theme="@style/ThemeOverlay.MaterialComponents.Dark" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/buyAndSellSwitch"
@@ -79,15 +61,15 @@
 
 
             <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/edtLimitPrice"
+                android:id="@+id/edtLimitStopPrice"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_gravity="center"
                 android:layout_margin="2dp"
                 android:layout_weight="1.2"
-                android:hint="@string/limit_price"
                 android:background="@drawable/outline_box"
                 android:gravity="center"
+                android:hint="@string/limit_price"
                 android:imeOptions="actionNext|flagNoExtractUi"
                 android:inputType="numberDecimal"
                 android:textColor="@color/primaryTextColor"
@@ -101,8 +83,8 @@
                 android:layout_gravity="center"
                 android:layout_margin="2dp"
                 android:layout_weight="1.2"
-                android:gravity="center"
                 android:background="@drawable/outline_box"
+                android:gravity="center"
                 android:hint="@string/Quantity"
                 android:imeOptions="actionDone|flagNoExtractUi"
                 android:inputType="number"

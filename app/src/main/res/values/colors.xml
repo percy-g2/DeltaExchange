@@ -12,6 +12,8 @@
     <color name="bottomNavSelected">#148bee</color>
     <color name="bottomNavUnSelected">#ffffff</color>
 
+    <color name="white">#ffffff</color>
+
     <color name="primaryTextColor">#ffffff</color>
     <color name="textColorSecondary">#ffffff</color>
 
