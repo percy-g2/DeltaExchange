@@ -90,16 +90,6 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
-
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/useTestNetServer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:visibility="gone"
-                android:checked="true"
-                android:text="@string/test_net_server"
-                android:textColor="@color/primaryTextColor" />
         </androidx.appcompat.widget.LinearLayoutCompat>
     </com.google.android.material.card.MaterialCardView>
 </androidx.appcompat.widget.LinearLayoutCompat>

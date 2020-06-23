@@ -2,8 +2,10 @@ package crypto.delta.exchange.openexchange.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
 import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKeys
+import androidx.security.crypto.MasterKey
 import crypto.delta.exchange.openexchange.R
 
 
@@ -16,13 +18,6 @@ class AppPreferenceManager(private val context: Context) {
 
     fun setApiKey(value: String?) {
         prefs.edit().putString(context.resources.getString(R.string.api_key_preference), value!!).apply()
-    }
-
-    val useTestNetServer: Boolean?
-        get() = prefs.getBoolean(context.resources.getString(R.string.test_net_server_preference), true)
-
-    fun setUseTestNetServer(value: Boolean?) {
-        prefs.edit().putBoolean(context.resources.getString(R.string.test_net_server_preference), value!!).apply()
     }
 
     val apiSecret: String?
@@ -65,11 +60,24 @@ class AppPreferenceManager(private val context: Context) {
     }
 
     private fun getEncryptedSharedPreferences(): SharedPreferences? {
-        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+
+        val spec = KeyGenParameterSpec.Builder(
+            MasterKey.DEFAULT_MASTER_KEY_ALIAS,
+            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+        )
+            .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+            .setKeySize(MasterKey.DEFAULT_AES_GCM_MASTER_KEY_SIZE)
+            .build()
+
+        val masterKey = MasterKey.Builder(context)
+            .setKeyGenParameterSpec(spec)
+            .build()
+
         return EncryptedSharedPreferences.create(
-            "secret_shared_prefs_file",
-            masterKeyAlias,
             context,
+            "secret_shared_prefs_file",
+            masterKey,
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
         )

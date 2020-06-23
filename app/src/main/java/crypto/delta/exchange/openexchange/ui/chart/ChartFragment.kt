@@ -178,6 +178,7 @@ class ChartFragment : BaseFragment() {
                     }
                     k_line_chart.addData(klinedata)
                     k_line_chart.setSubIndicatorType(Indicator.Type.NO)
+                    k_line_chart.setMainIndicatorType(Indicator.Type.NO)
                     requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                 }
             } catch (e: IOException) {
