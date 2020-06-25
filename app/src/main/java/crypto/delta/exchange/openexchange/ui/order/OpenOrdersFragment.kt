@@ -81,4 +81,8 @@ class OpenOrdersFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener 
             }
         }
     }
+
+    fun update() {
+        loadOrders()
+    }
 }

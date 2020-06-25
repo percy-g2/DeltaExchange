@@ -84,4 +84,8 @@ class PositionsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
             }
         }
     }
+
+    fun update() {
+        loadOrders()
+    }
 }

@@ -38,7 +38,7 @@ import java.net.SocketTimeoutException
 
 class OrderFragment : BaseFragment() {
     private val logTag: String? = OrderFragment::class.java.simpleName
-
+    private var sectionsPagerAdapter: SectionsPagerAdapter? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -57,7 +57,7 @@ class OrderFragment : BaseFragment() {
         lifecycleScope.launch {
             delay(300)
             currentSymbol.text = appPreferenceManager!!.currentProductSymbol!!
-            val sectionsPagerAdapter = SectionsPagerAdapter(childFragmentManager)
+            sectionsPagerAdapter = SectionsPagerAdapter(childFragmentManager)
             viewPager!!.adapter = sectionsPagerAdapter
             viewPager!!.currentItem = 0
 
@@ -951,6 +951,10 @@ class OrderFragment : BaseFragment() {
                             Toast.LENGTH_SHORT,
                             true
                         ).show()
+                        sectionsPagerAdapter!!.notifyDataSetChanged()
+                        edtLimitPrice.editableText.clear()
+                        edtStopPrice.editableText.clear()
+                        edtQuantity.editableText.clear()
                     } else {
                         val errorBody = Gson().fromJson(
                             response.errorBody()!!.charStream(),
@@ -1026,6 +1030,16 @@ class OrderFragment : BaseFragment() {
                 }
                 else -> PositionsFragment()
             }
+        }
+
+        override fun getItemPosition(`object`: Any): Int {
+            if (`object` is OpenOrdersFragment) {
+                `object`.update()
+            }
+            if (`object` is PositionsFragment) {
+                `object`.update()
+            }
+            return super.getItemPosition(`object`)
         }
 
         override fun getCount(): Int {
