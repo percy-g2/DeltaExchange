@@ -23,7 +23,6 @@ class OpenOrdersAdapter (private var ordersResponseList: List<CreateOrderRespons
         internal val contract: AppCompatTextView = itemView.findViewById(R.id.contract)
         internal val quantity: AppCompatTextView = itemView.findViewById(R.id.quantity)
         internal val filledLeft: AppCompatTextView = itemView.findViewById(R.id.filledLeft)
-        internal val value: AppCompatTextView = itemView.findViewById(R.id.value)
         internal val type: AppCompatTextView = itemView.findViewById(R.id.type)
     }
 
@@ -31,8 +30,21 @@ class OpenOrdersAdapter (private var ordersResponseList: List<CreateOrderRespons
         val ordersResponse = ordersResponseList[position]
         holder.contract.text = ordersResponse.product!!.symbol
         holder.quantity.text = ordersResponse.size!!.toString()
-        holder.filledLeft.text = (ordersResponse.size!!.minus(ordersResponse.unfilledSize!!)).toString() + "/" + ordersResponse.unfilledSize!!.toString()
-        holder.value.text = ""
-        holder.type.text = ordersResponse.orderType
+        holder.filledLeft.text =
+            (ordersResponse.size!!.minus(ordersResponse.unfilledSize!!)).toString().plus("/")
+                .plus(ordersResponse.unfilledSize!!.toString())
+
+        when {
+            ordersResponse.orderType.equals("limit_order") -> {
+                holder.type.text = "Limit"
+            }
+            ordersResponse.orderType.equals("market_order") -> {
+                holder.type.text = "Market"
+            }
+            else -> {
+                holder.type.text = ordersResponse.orderType
+            }
+        }
+
     }
 }
