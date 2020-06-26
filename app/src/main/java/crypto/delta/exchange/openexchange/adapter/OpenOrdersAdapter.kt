@@ -5,10 +5,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import crypto.delta.exchange.openexchange.R
+import crypto.delta.exchange.openexchange.interfaces.OrdersInterface
 import crypto.delta.exchange.openexchange.pojo.order.CreateOrderResponse
 
-class OpenOrdersAdapter (private var ordersResponseList: List<CreateOrderResponse>) : RecyclerView.Adapter<OpenOrdersAdapter.ViewHolder>() {
+class OpenOrdersAdapter(
+    private var ordersResponseList: List<CreateOrderResponse>,
+    private val ordersInterface: OrdersInterface
+) : RecyclerView.Adapter<OpenOrdersAdapter.ViewHolder>() {
 
     override fun getItemCount() = ordersResponseList.size
 
@@ -24,6 +29,13 @@ class OpenOrdersAdapter (private var ordersResponseList: List<CreateOrderRespons
         internal val quantity: AppCompatTextView = itemView.findViewById(R.id.quantity)
         internal val filledLeft: AppCompatTextView = itemView.findViewById(R.id.filledLeft)
         internal val type: AppCompatTextView = itemView.findViewById(R.id.type)
+        private val btnCancelOrder: MaterialButton = itemView.findViewById(R.id.btnCancelOrder)
+
+        init {
+            btnCancelOrder.setOnClickListener {
+                ordersInterface.onCancelOrder(ordersResponseList[adapterPosition])
+            }
+        }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

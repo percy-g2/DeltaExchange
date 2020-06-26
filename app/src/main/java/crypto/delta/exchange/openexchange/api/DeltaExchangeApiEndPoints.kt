@@ -1,5 +1,6 @@
 package crypto.delta.exchange.openexchange.api
 
+import crypto.delta.exchange.openexchange.pojo.DeleteOrderRequest
 import crypto.delta.exchange.openexchange.pojo.DeltaExchangeChartHistoryResponse
 import crypto.delta.exchange.openexchange.pojo.DeltaExchangeTickerResponse
 import crypto.delta.exchange.openexchange.pojo.OrderBookResponse
@@ -81,5 +82,13 @@ interface DeltaExchangeApiEndPoints {
         @Header("api-key") apiKey: String,
         @Header("timestamp") timestamp: String,
         @Header("signature") signature: String
+    ): Call<ResponseBody>
+
+    @HTTP(method = "DELETE", path = "/orders", hasBody = true)
+    fun cancelOrder(
+        @Header("api-key") apiKey: String,
+        @Header("timestamp") timestamp: String,
+        @Header("signature") signature: String,
+        @Body deleteOrderRequest: DeleteOrderRequest
     ): Call<ResponseBody>
 }

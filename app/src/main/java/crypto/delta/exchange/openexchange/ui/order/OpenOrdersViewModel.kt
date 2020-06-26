@@ -5,10 +5,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import crypto.delta.exchange.openexchange.BaseViewModel
 import crypto.delta.exchange.openexchange.api.DeltaRepository
+import crypto.delta.exchange.openexchange.pojo.DeleteOrderRequest
 import crypto.delta.exchange.openexchange.pojo.order.CreateOrderResponse
+import okhttp3.ResponseBody
+import retrofit2.Response
 
 class OpenOrdersViewModel(application: Application) : BaseViewModel(application) {
-    private var mutableLiveData: MutableLiveData<List<CreateOrderResponse>?>? = null
+    private var ordersListMutableLiveData: MutableLiveData<List<CreateOrderResponse>?>? = null
+    private var cancelOrderMutableLiveData: MutableLiveData<Response<ResponseBody?>>? = null
     private var deltaRepository: DeltaRepository? = null
 
     fun init() {
@@ -24,8 +28,19 @@ class OpenOrdersViewModel(application: Application) : BaseViewModel(application)
         productId: String,
         state: String
     ): LiveData<List<CreateOrderResponse>?>? {
-        mutableLiveData =
+        ordersListMutableLiveData =
             deltaRepository!!.getOrders(apiKey, timestamp, signature, productId, state)
-        return mutableLiveData
+        return ordersListMutableLiveData
+    }
+
+    fun cancelOrder(
+        apiKey: String,
+        timestamp: String,
+        signature: String,
+        deleteOrderRequest: DeleteOrderRequest
+    ): LiveData<Response<ResponseBody?>>? {
+        cancelOrderMutableLiveData =
+            deltaRepository!!.cancelOrder(apiKey, timestamp, signature, deleteOrderRequest)
+        return cancelOrderMutableLiveData
     }
 }

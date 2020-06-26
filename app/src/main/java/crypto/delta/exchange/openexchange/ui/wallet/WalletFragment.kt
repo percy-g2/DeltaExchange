@@ -62,7 +62,6 @@ class WalletFragment : BaseFragment() {
         )
         walletViewModel.getWallet(appPreferenceManager!!.apiKey!!, timeStamp, signature!!)!!
             .observe(viewLifecycleOwner, Observer {
-
                 if (it.code() == 200) {
                     val myType = object : TypeToken<List<WalletResponse>>() {}.type
                     val responseList =
@@ -78,7 +77,7 @@ class WalletFragment : BaseFragment() {
                     )
                     Toasty.error(
                         requireContext(),
-                        errorBody.message,
+                        errorBody.message!!,
                         Toast.LENGTH_SHORT,
                         true
                     ).show()

@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import crypto.delta.exchange.openexchange.BaseViewModel
+import crypto.delta.exchange.openexchange.pojo.DeleteOrderRequest
 import crypto.delta.exchange.openexchange.pojo.DeltaExchangeChartHistoryResponse
 import crypto.delta.exchange.openexchange.pojo.DeltaExchangeTickerResponse
 import crypto.delta.exchange.openexchange.pojo.OrderBookResponse
@@ -49,7 +50,7 @@ class DeltaRepository(application: Application) : BaseViewModel(application) {
         strTo: String
     ): MutableLiveData<DeltaExchangeChartHistoryResponse?> {
         val data: MutableLiveData<DeltaExchangeChartHistoryResponse?> =
-            MutableLiveData<DeltaExchangeChartHistoryResponse?>()
+            MutableLiveData()
         deltaExchangeApiEndPoints!!.getChartHistory(symbol, resolution, strFrom, strTo)
             .enqueue(object :
                 Callback<DeltaExchangeChartHistoryResponse?> {
@@ -75,7 +76,7 @@ class DeltaRepository(application: Application) : BaseViewModel(application) {
     }
 
     fun getOrders(apiKey: String, timestamp: String, signature: String, productId: String, state: String): MutableLiveData<List<CreateOrderResponse>?> {
-        val data: MutableLiveData<List<CreateOrderResponse>?> = MutableLiveData<List<CreateOrderResponse>?>()
+        val data: MutableLiveData<List<CreateOrderResponse>?> = MutableLiveData()
         deltaExchangeApiEndPoints!!.getOrders(apiKey, timestamp, signature, state).enqueue(object :
             Callback<List<CreateOrderResponse>?> {
             override fun onResponse(
@@ -102,7 +103,7 @@ class DeltaRepository(application: Application) : BaseViewModel(application) {
         signature: String
     ): MutableLiveData<List<OpenPositionResponse>?> {
         val data: MutableLiveData<List<OpenPositionResponse>?> =
-            MutableLiveData<List<OpenPositionResponse>?>()
+            MutableLiveData()
         deltaExchangeApiEndPoints!!.getOpenPositions(apiKey, timestamp, signature).enqueue(object :
             Callback<List<OpenPositionResponse>?> {
             override fun onResponse(
@@ -124,7 +125,7 @@ class DeltaRepository(application: Application) : BaseViewModel(application) {
     }
 
     fun getOrderBook(productId: String): MutableLiveData<OrderBookResponse?> {
-        val data: MutableLiveData<OrderBookResponse?> = MutableLiveData<OrderBookResponse?>()
+        val data: MutableLiveData<OrderBookResponse?> = MutableLiveData()
         deltaExchangeApiEndPoints!!.getOrderBook(productId).enqueue(object :
             Callback<OrderBookResponse?> {
             override fun onResponse(
@@ -147,7 +148,7 @@ class DeltaRepository(application: Application) : BaseViewModel(application) {
 
     fun getProducts(disposables: CompositeDisposable): MutableLiveData<List<ProductsResponse>> {
         val data: MutableLiveData<List<ProductsResponse>> =
-            MutableLiveData<List<ProductsResponse>>()
+            MutableLiveData()
         deltaExchangeApiEndPoints!!.getProducts()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -200,6 +201,32 @@ class DeltaRepository(application: Application) : BaseViewModel(application) {
         val data: MutableLiveData<Response<ResponseBody?>> =
             MutableLiveData()
         deltaExchangeApiEndPoints!!.getWallet(apiKey, timestamp, signature)
+            .enqueue(object :
+                Callback<ResponseBody?> {
+                override fun onResponse(
+                    call: Call<ResponseBody?>?,
+                    response: Response<ResponseBody?>
+                ) {
+
+                    data.value = response
+                }
+
+                override fun onFailure(call: Call<ResponseBody?>?, t: Throwable?) {
+                    data.value = null
+                }
+            })
+        return data
+    }
+
+    fun cancelOrder(
+        apiKey: String,
+        timestamp: String,
+        signature: String,
+        deleteOrderRequest: DeleteOrderRequest
+    ): MutableLiveData<Response<ResponseBody?>>? {
+        val data: MutableLiveData<Response<ResponseBody?>> =
+            MutableLiveData()
+        deltaExchangeApiEndPoints!!.cancelOrder(apiKey, timestamp, signature, deleteOrderRequest)
             .enqueue(object :
                 Callback<ResponseBody?> {
                 override fun onResponse(

@@ -99,4 +99,6 @@
     <string name="stop_price">Stop Price</string>
     <string name="trailing_amount">Trailing Amount</string>
     <string name="version">"Version:  "</string>
+    <string name="x">X</string>
+    <string name="order_cancelled_successfully">Order cancelled successfully!!</string>
 </resources>

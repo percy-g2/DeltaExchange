@@ -19,7 +19,7 @@
             android:layout_gravity="center"
             android:layout_weight=".5"
             android:orientation="horizontal"
-            android:weightSum="4">
+            android:weightSum="4.5">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="0dp"
@@ -54,6 +54,14 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="@string/type"
+                android:textColor="@color/primaryTextColor"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight=".5"
+                android:gravity="center"
                 android:textColor="@color/primaryTextColor"
                 android:textStyle="bold" />
         </androidx.appcompat.widget.LinearLayoutCompat>
