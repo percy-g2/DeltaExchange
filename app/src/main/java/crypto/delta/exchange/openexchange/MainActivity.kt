@@ -11,6 +11,7 @@ import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import crypto.delta.exchange.openexchange.utils.setupWithNavController
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -119,6 +120,7 @@ class MainActivity : AppCompatActivity() {
             }
 
         internetDisposable = ReactiveNetwork.observeInternetConnectivity()
+            .onErrorResumeNext(Observable.empty())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { isConnectedToInternet ->

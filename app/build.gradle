@@ -12,7 +12,7 @@ android {
         targetSdkVersion 30
         versionCode 5
         versionName "beta-1.0"
-        ndk.abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+       // ndk.abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
         externalNativeBuild {
             cmake {
                 cppFlags ""
@@ -49,8 +49,42 @@ android {
         }
     }
 
-// To inline the bytecode built with JVM target 1.8 into
-// bytecode that is being built with JVM target 1.6. (e.g. navArgs)
+    /**
+     * Configure your build for multiple apks.
+     *
+     * To configure your build for multiple apks. add a splits to your module-level 'build.gradle' file.
+     *
+     * Within the 'splits' block, provide a 'density' block that specifies how Gradle build generate pre-density apks.
+     * an 'abi(application binary interfaces)' block that specifies how gradle should generate pre-ABI APKS.
+     */
+      splits {
+    /**
+     * Configure multiple APKs for ABIs
+     *
+     * Android Plugin for Gradle 3.1.0 and higher no longer generate APKs for the following ABIs by default: mips, mips64, and armeabi.
+     * That's because NDK r17 and higher no longer include these ABIs as supported targets.
+     *
+     * universalApk:
+     */
+    // Configures multiple APKs based on ABI.
+         abi {
+
+    // Enables building multiple APKs per ABI.
+            enable true
+
+    // By default all ABIs are included, so use reset() and include to specify that we only
+    // want APKs for x86 and x86_64.
+
+    // Resets the list of ABIs that Gradle should create APKs for to none.
+           reset()
+
+    // Specifies a list of ABIs that Gradle should create APKs for.
+           include "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+
+    // Specifies that we do not want to also generate a universal APK that includes all ABIs.
+            universalApk false
+        }
+     }
 
 
     compileOptions {

@@ -55,8 +55,5 @@ class HomeAdapter(
                     holder.dayVolume.text = "--"
                 }
             })
-
     }
-
-
 }

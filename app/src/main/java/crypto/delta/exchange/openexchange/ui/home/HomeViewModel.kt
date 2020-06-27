@@ -1,7 +1,6 @@
 package crypto.delta.exchange.openexchange.ui.home
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import crypto.delta.exchange.openexchange.BaseViewModel
@@ -14,7 +13,7 @@ class HomeViewModel(application: Application) : BaseViewModel(application) {
     private var deltaRepository: DeltaRepository? = null
     private val disposables: CompositeDisposable = CompositeDisposable()
 
-    fun init(context: Context) {
+    fun init() {
         deltaRepository = DeltaRepository.getInstance(this.getApplication())
     }
 

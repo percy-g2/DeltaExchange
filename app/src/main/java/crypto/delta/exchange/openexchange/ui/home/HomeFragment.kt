@@ -29,7 +29,7 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
         savedInstanceState: Bundle?
     ): View? {
         homeViewModel = ViewModelProvider(this@HomeFragment).get(HomeViewModel::class.java)
-        homeViewModel.init(requireContext())
+        homeViewModel.init()
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
