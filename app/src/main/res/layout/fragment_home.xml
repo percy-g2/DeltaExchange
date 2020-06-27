@@ -17,6 +17,7 @@
             android:layout_height="0dp"
             android:layout_weight=".7"
             app:tabBackground="@color/colorPrimaryAlternate"
+            app:tabSelectedTextColor="@color/colorOrange"
             app:tabGravity="fill"
             app:tabIndicatorColor="@color/colorAccent"
             app:tabMode="fixed"
@@ -47,6 +48,7 @@
             android:layout_height="0dp"
             android:layout_gravity="center"
             android:layout_weight=".5"
+            app:tabSelectedTextColor="@color/colorOrange"
             android:layout_margin="5dp"
             app:tabBackground="@color/colorPrimaryAlternate"
             app:tabGravity="fill"
@@ -141,4 +143,12 @@
         app:dot_neutralColor="@color/primaryTextColor"
         app:dot_num_dots="5"
         android:indeterminate="true" />
+
+    <ImageView
+        android:id="@+id/errorImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:src="@drawable/error"
+        android:visibility="gone" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

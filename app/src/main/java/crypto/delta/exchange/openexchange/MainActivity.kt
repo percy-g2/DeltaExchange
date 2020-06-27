@@ -110,10 +110,12 @@ class MainActivity : AppCompatActivity() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { connectivity ->
-                Log.d(TAG, connectivity.toString())
-                val state = connectivity.state()
-                val name = connectivity.typeName()
-                Log.i(TAG, String.format("state: %s, typeName: %s", state, name))
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, connectivity.toString())
+                    val state = connectivity.state()
+                    val name = connectivity.typeName()
+                    Log.i(TAG, String.format("state: %s, typeName: %s", state, name))
+                }
             }
 
         internetDisposable = ReactiveNetwork.observeInternetConnectivity()
@@ -134,13 +136,12 @@ class MainActivity : AppCompatActivity() {
                                     .setTitle("No Internet!!")
                                     .setMessage("Check your internet connectivity!")
                                     .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .setView(R.layout.progress_bar)
                                     .setCancelable(false)
                                     .show()
                         }
                     }
                 }
-
-                Log.i(TAG, isConnectedToInternet.toString())
             }
     }
 

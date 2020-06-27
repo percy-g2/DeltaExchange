@@ -58,9 +58,16 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                     requireActivity()
                 )
                 progressSpinner.visibility = View.GONE
+                errorImage.visibility = View.GONE
+            } else {
+                errorImage.visibility = View.VISIBLE
+                progressSpinner.visibility = View.GONE
             }
         })
 
+        errorImage.setOnClickListener {
+            loadAgain()
+        }
 
         futuresSettled.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
@@ -232,7 +239,7 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
 
     }
 
-    override fun onRefresh() {
+    private fun loadAgain() {
 
         homeViewModel.getProducts()!!.observe(viewLifecycleOwner, Observer { list ->
             if (null != list) {
@@ -301,6 +308,12 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
             if (swipeLayout.isRefreshing) {
                 swipeLayout.isRefreshing = false
             }
+            progressSpinner.visibility = View.GONE
+            errorImage.visibility = View.GONE
         })
+    }
+
+    override fun onRefresh() {
+        loadAgain()
     }
 }
