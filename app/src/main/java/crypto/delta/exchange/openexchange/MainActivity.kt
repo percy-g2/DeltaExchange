@@ -2,9 +2,13 @@ package crypto.delta.exchange.openexchange
 
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
+import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import crypto.delta.exchange.openexchange.utils.setupWithNavController
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -42,6 +46,44 @@ class MainActivity : AppCompatActivity() {
      */
     private fun setupBottomNavigationBar() {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
+
+        val menuView =
+            bottomNavigationView.getChildAt(0) as BottomNavigationMenuView
+        for (i in 0 until menuView.childCount) {
+            val iconView: View =
+                menuView.getChildAt(i).findViewById(androidx.navigation.ui.R.id.icon)
+            val layoutParams: ViewGroup.LayoutParams = iconView.layoutParams
+            val displayMetrics = resources.displayMetrics
+            // If it is my special menu item change the size, otherwise take other size
+            if (i == 2) {
+                // set your height here
+                layoutParams.height = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    45f,
+                    displayMetrics
+                ).toInt()
+                // set your width here
+                layoutParams.width = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    45f,
+                    displayMetrics
+                ).toInt()
+            } else {
+                // set your height here
+                layoutParams.height = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    25f,
+                    displayMetrics
+                ).toInt()
+                // set your width here
+                layoutParams.width = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    25f,
+                    displayMetrics
+                ).toInt()
+            }
+            iconView.layoutParams = layoutParams
+        }
 
         val navGraphIds =
             listOf(

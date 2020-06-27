@@ -221,7 +221,7 @@ class OrderFragment : BaseFragment() {
                             )
                             Toasty.error(
                                 requireContext(),
-                                errorBody.message,
+                                errorBody.message!!,
                                 Toast.LENGTH_SHORT,
                                 true
                             ).show()
@@ -479,7 +479,7 @@ class OrderFragment : BaseFragment() {
                                     )
                                     Toasty.error(
                                         requireContext(),
-                                        errorBody.message,
+                                        errorBody.message!!,
                                         Toast.LENGTH_SHORT,
                                         true
                                     ).show()
@@ -526,13 +526,6 @@ class OrderFragment : BaseFragment() {
                                 progressBar.dismiss()
                             }
                         })
-                    } else {
-                        Toasty.error(
-                            requireContext(),
-                            requireContext().getString(R.string.api_details_error),
-                            Toast.LENGTH_SHORT,
-                            true
-                        ).show()
                     }
                 }
 
@@ -962,7 +955,7 @@ class OrderFragment : BaseFragment() {
                         )
                         Toasty.error(
                             requireContext(),
-                            errorBody.message,
+                            errorBody.message!!,
                             Toast.LENGTH_SHORT,
                             true
                         ).show()
@@ -1028,6 +1021,10 @@ class OrderFragment : BaseFragment() {
                     // find second fragment...
                     OpenOrdersFragment()
                 }
+                2 -> {
+                    // find second fragment...
+                    StopOrdersFragment()
+                }
                 else -> PositionsFragment()
             }
         }
@@ -1039,18 +1036,22 @@ class OrderFragment : BaseFragment() {
             if (`object` is PositionsFragment) {
                 `object`.update()
             }
+            if (`object` is StopOrdersFragment) {
+                `object`.update()
+            }
             return super.getItemPosition(`object`)
         }
 
         override fun getCount(): Int {
             // Show 2 total pages.
-            return 2
+            return 3
         }
 
         override fun getPageTitle(position: Int): CharSequence? {
             when (position) {
                 0 -> return resources.getString(R.string.position)
                 1 -> return resources.getString(R.string.open_orders)
+                2 -> return resources.getString(R.string.stop_orders)
             }
             return "null"
         }

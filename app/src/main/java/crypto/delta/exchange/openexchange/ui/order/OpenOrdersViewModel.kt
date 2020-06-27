@@ -12,6 +12,7 @@ import retrofit2.Response
 
 class OpenOrdersViewModel(application: Application) : BaseViewModel(application) {
     private var ordersListMutableLiveData: MutableLiveData<List<CreateOrderResponse>?>? = null
+    private var stopOrdersListMutableLiveData: MutableLiveData<List<CreateOrderResponse>?>? = null
     private var cancelOrderMutableLiveData: MutableLiveData<Response<ResponseBody?>>? = null
     private var deltaRepository: DeltaRepository? = null
 
@@ -31,6 +32,19 @@ class OpenOrdersViewModel(application: Application) : BaseViewModel(application)
         ordersListMutableLiveData =
             deltaRepository!!.getOrders(apiKey, timestamp, signature, productId, state)
         return ordersListMutableLiveData
+    }
+
+
+    fun getStopOrders(
+        apiKey: String,
+        timestamp: String,
+        signature: String,
+        stopOrderType: String,
+        state: String
+    ): LiveData<List<CreateOrderResponse>?>? {
+        stopOrdersListMutableLiveData =
+            deltaRepository!!.getStopOrders(apiKey, timestamp, signature, stopOrderType, state)
+        return stopOrdersListMutableLiveData
     }
 
     fun cancelOrder(

@@ -97,6 +97,40 @@ class DeltaRepository(application: Application) : BaseViewModel(application) {
         return data
     }
 
+    fun getStopOrders(
+        apiKey: String,
+        timestamp: String,
+        signature: String,
+        stopOrderType: String,
+        state: String
+    ): MutableLiveData<List<CreateOrderResponse>?> {
+        val data: MutableLiveData<List<CreateOrderResponse>?> = MutableLiveData()
+        deltaExchangeApiEndPoints!!.getStopOrders(
+            apiKey,
+            timestamp,
+            signature,
+            state,
+            stopOrderType
+        ).enqueue(object :
+            Callback<List<CreateOrderResponse>?> {
+            override fun onResponse(
+                call: Call<List<CreateOrderResponse>?>?,
+                response: Response<List<CreateOrderResponse>?>
+            ) {
+                if (response.isSuccessful) {
+                    data.value = response.body()
+                } else {
+                    data.value = null
+                }
+            }
+
+            override fun onFailure(call: Call<List<CreateOrderResponse>?>?, t: Throwable?) {
+                data.value = null
+            }
+        })
+        return data
+    }
+
     fun getOpenPositions(
         apiKey: String,
         timestamp: String,

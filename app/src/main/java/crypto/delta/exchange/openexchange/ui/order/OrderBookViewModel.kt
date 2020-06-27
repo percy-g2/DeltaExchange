@@ -86,8 +86,8 @@ class OrderBookViewModel(application: Application) : BaseViewModel(application) 
     }
 
     fun observeOrderBook(): MutableLiveData<DeltaExchangeL2OrderBookResponse> {
-        val test: MutableLiveData<DeltaExchangeL2OrderBookResponse> =
-            MutableLiveData<DeltaExchangeL2OrderBookResponse>()
+        val orderBookData: MutableLiveData<DeltaExchangeL2OrderBookResponse> =
+            MutableLiveData()
         deltaExchangeSocketServiceRepository!!.observeOrderBook()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -113,7 +113,7 @@ class OrderBookViewModel(application: Application) : BaseViewModel(application) 
                                     it.d_size
                                 }
                         }
-                        test.value = response
+                        orderBookData.value = response
                     }
                 }
             }, { error ->
@@ -123,7 +123,7 @@ class OrderBookViewModel(application: Application) : BaseViewModel(application) 
                 )
                 error.printStackTrace()
             }).addTo(disposables)
-        return test
+        return orderBookData
     }
 
     private fun sendSubscribe(action: Subscribe) {

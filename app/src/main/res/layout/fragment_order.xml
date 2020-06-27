@@ -26,7 +26,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textColor="@color/colorAccent"
+                android:textColor="@color/colorOrange"
                 android:textStyle="bold"
                 tools:text="BTCUSD" />
 
@@ -336,6 +336,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/open_orders" />
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/stopOrdersTab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/stop_orders" />
         </com.google.android.material.tabs.TabLayout>
 
         <androidx.viewpager.widget.ViewPager

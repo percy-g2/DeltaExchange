@@ -11,8 +11,8 @@
         android:title="@string/title_chart" />
     <item
         android:id="@+id/order"
-        android:icon="@drawable/ic_description_black_24dp"
-        android:title="@string/title_order" />
+        android:icon="@drawable/ic_order"
+        android:title="" />
     <item
         android:id="@+id/wallet"
         android:icon="@drawable/ic_baseline_account_balance_wallet_24"

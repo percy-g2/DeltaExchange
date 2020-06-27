@@ -9,7 +9,7 @@
 
     <color name="backgroundColor">#000000</color>
 
-    <color name="bottomNavSelected">#148bee</color>
+    <color name="bottomNavSelected">@color/colorOrange</color>
     <color name="bottomNavUnSelected">#ffffff</color>
 
     <color name="white">#ffffff</color>

@@ -30,7 +30,7 @@ class WalletAdapter(private var walletResponseList: List<WalletResponse>) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val wallet = walletResponseList[position]
-        holder.coin.text = wallet.asset.symbol
+        holder.coin.text = wallet.asset!!.symbol
         holder.walletBalance.text = wallet.balance
         holder.positionMargin.text = wallet.positionMargin
         holder.orderMargin.text = wallet.orderMargin

@@ -22,7 +22,7 @@
         app:backgroundTint="@color/colorPrimaryDark"
         app:elevation="8dp"
         app:itemIconTint="@color/bottom_nav_button_forg"
-        app:itemTextColor="@color/primaryTextColor"
+        app:itemTextColor="@color/bottom_nav_button_forg"
         app:itemRippleColor="@color/primaryTextColor"
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"

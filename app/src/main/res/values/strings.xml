@@ -101,4 +101,5 @@
     <string name="version">"Version:  "</string>
     <string name="x">X</string>
     <string name="order_cancelled_successfully">Order cancelled successfully!!</string>
+    <string name="stop_orders">Stop Orders</string>
 </resources>

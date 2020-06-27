@@ -69,6 +69,15 @@ interface DeltaExchangeApiEndPoints {
         @Query("state") state: String
     ): Call<List<CreateOrderResponse>>
 
+    @GET("/orders")
+    fun getStopOrders(
+        @Header("api-key") apiKey: String,
+        @Header("timestamp") timestamp: String,
+        @Header("signature") signature: String,
+        @Query("state") state: String,
+        @Query("stop_order_type") stopOrderType: String
+    ): Call<List<CreateOrderResponse>>
+
     @GET("/positions")
     fun getOpenPositions(
         @Header("api-key") apiKey: String,
