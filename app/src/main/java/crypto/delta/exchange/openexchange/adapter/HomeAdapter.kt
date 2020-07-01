@@ -5,21 +5,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import crypto.delta.exchange.openexchange.R
-import crypto.delta.exchange.openexchange.api.DeltaRepository
+import crypto.delta.exchange.openexchange.pojo.DeltaExchangeTickerResponse
 import crypto.delta.exchange.openexchange.pojo.products.ProductsResponse
 import crypto.delta.exchange.openexchange.utils.AppPreferenceManager
 
 
 class HomeAdapter(
     private var productsResponseList: List<ProductsResponse>,
-    private val requireActivity: FragmentActivity
+    private val requireActivity: FragmentActivity,
+    private var tickerResponseList: HashSet<DeltaExchangeTickerResponse>?
 ) : RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
-
-    private val deltaRepository = DeltaRepository.getInstance(requireActivity.application)
 
     override fun getItemCount() = productsResponseList.size
 
@@ -44,16 +42,25 @@ class HomeAdapter(
             requireActivity.findNavController(R.id.nav_host_fragment)
                 .navigate(R.id.action_to_chart)
         }
-        deltaRepository!!.getProductsData(product.symbol!!)!!
-            .observe(requireActivity, Observer { tickerResponse ->
-                if (null != tickerResponse.close) {
-                    holder.lastPrice.text = tickerResponse.close?.toBigDecimal()?.toPlainString()
-                    holder.dayVolume.text =
-                        String.format(tickerResponse.volume!!.toString() + " " + product.quotingAsset!!.symbol)
-                } else {
-                    holder.lastPrice.text = "--"
-                    holder.dayVolume.text = "--"
-                }
-            })
+        for (ticker in tickerResponseList!!) {
+            if (ticker.symbol == product.symbol) {
+                holder.lastPrice.text = ticker.close?.toBigDecimal()?.toPlainString()
+                holder.dayVolume.text =
+                    String.format(ticker.volume!!.toString() + " " + product.quotingAsset!!.symbol)
+            }
+        }
+    }
+
+    fun updateData(data: List<ProductsResponse>) {
+        this.productsResponseList = data
+        notifyDataSetChanged()
+    }
+
+    fun updateTicker(deltaExchangeTickerResponse: DeltaExchangeTickerResponse) {
+        for (ticker in this.tickerResponseList!!) {
+            if (ticker.symbol == deltaExchangeTickerResponse.symbol) {
+                tickerResponseList!!.remove(ticker)
+            }
+        }
     }
 }

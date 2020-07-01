@@ -12,6 +12,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.tabs.TabLayout
 import crypto.delta.exchange.openexchange.R
 import crypto.delta.exchange.openexchange.adapter.HomeAdapter
+import crypto.delta.exchange.openexchange.pojo.DeltaExchangeTickerResponse
 import crypto.delta.exchange.openexchange.pojo.products.ProductsResponse
 import crypto.delta.exchange.openexchange.ui.base.BaseFragment
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -20,9 +21,11 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private lateinit var homeViewModel: HomeViewModel
 
-    private var productsResponseList: List<ProductsResponse>? = null
-    private var filteredProductsResponseList: List<ProductsResponse>? = null
-
+    private var productsResponseList: List<ProductsResponse> = ArrayList()
+    private var filteredProductsResponseList: List<ProductsResponse>? = ArrayList()
+    private var tickerResponseList: HashSet<DeltaExchangeTickerResponse> = HashSet()
+    private var layoutManager: LinearLayoutManager? = null
+    private var homeAdapter: HomeAdapter? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -35,7 +38,8 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        homeRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        layoutManager = LinearLayoutManager(requireContext())
+        homeRecyclerView.layoutManager = layoutManager
         homeRecyclerView.itemAnimator = null
         homeRecyclerView.addItemDecoration(
             DividerItemDecoration(
@@ -45,18 +49,27 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
         )
         swipeLayout.setOnRefreshListener(this)
 
+        homeAdapter = HomeAdapter(productsResponseList, requireActivity(), tickerResponseList)
+        homeRecyclerView.adapter = homeAdapter
         homeViewModel.getProducts()!!.observe(viewLifecycleOwner, Observer { list ->
             if (null != list) {
                 productsResponseList = list
                 filteredProductsResponseList = productsResponseList
-                homeRecyclerView.adapter = HomeAdapter(
-                    filteredProductsResponseList!!.filter {
-                        (it.productType == "inverse_future" || it.productType == "future") && (it.contractType == "futures" || it.contractType == "perpetual_futures") && !it.symbol!!.contains(
-                            "USDT".toRegex()
-                        )
-                    },
-                    requireActivity()
-                )
+                homeViewModel.observeWebSocketEvent(productsResponseList)
+                homeAdapter!!.updateData(filteredProductsResponseList!!.filter {
+                    (it.productType == "inverse_future" || it.productType == "future") && (it.contractType == "futures" || it.contractType == "perpetual_futures") && !it.symbol!!.contains(
+                        "USDT".toRegex()
+                    )
+                })
+                homeViewModel.observeTicker()
+                    .observe(viewLifecycleOwner, Observer { deltaExchangeTickerResponse ->
+                        homeAdapter!!.updateTicker(deltaExchangeTickerResponse)
+                        if (layoutManager!!.findFirstVisibleItemPosition() == 0) {
+                            layoutManager!!.scrollToPositionWithOffset(0, 0)
+                        } else {
+                            homeRecyclerView.scrollToPosition(layoutManager!!.findLastVisibleItemPosition() - 1)
+                        }
+                    })
                 progressSpinner.visibility = View.GONE
                 errorImage.visibility = View.GONE
             } else {
@@ -81,7 +94,8 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                                         "USDT".toRegex()
                                     )
                                 },
-                                requireActivity()
+                                requireActivity(),
+                                tickerResponseList
                             )
                         }
                     }
@@ -94,7 +108,8 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                                         "USDT".toRegex()
                                     )
                                 },
-                                requireActivity()
+                                requireActivity(),
+                                tickerResponseList
                             )
                         }
                     }
@@ -127,7 +142,8 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                                                 "USDT".toRegex()
                                             )
                                         },
-                                        requireActivity()
+                                        requireActivity(),
+                                        tickerResponseList
                                     )
                                 }
                             }
@@ -142,7 +158,8 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                                                 "USDT".toRegex()
                                             )
                                         },
-                                        requireActivity()
+                                        requireActivity(),
+                                        tickerResponseList
                                     )
                                 }
                             }
@@ -154,7 +171,8 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                             filteredProductsResponseList = productsResponseList
                             homeRecyclerView.adapter = HomeAdapter(
                                 filteredProductsResponseList!!.filter { it.productType == "future" && it.contractType == "move_options" },
-                                requireActivity()
+                                requireActivity(),
+                                tickerResponseList
                             )
                         }
                     }
@@ -164,7 +182,8 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                             filteredProductsResponseList = productsResponseList
                             homeRecyclerView.adapter = HomeAdapter(
                                 filteredProductsResponseList!!.filter { it.productType == "inverse_future" && it.contractType == "interest_rate_swaps" },
-                                requireActivity()
+                                requireActivity(),
+                                tickerResponseList
                             )
                         }
                     }
@@ -187,7 +206,8 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                                                 "USDT".toRegex()
                                             )
                                         },
-                                        requireActivity()
+                                        requireActivity(),
+                                        tickerResponseList
                                     )
                                 }
                             }
@@ -202,7 +222,8 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                                                 "USDT".toRegex()
                                             )
                                         },
-                                        requireActivity()
+                                        requireActivity(),
+                                        tickerResponseList
                                     )
                                 }
                             }
@@ -214,7 +235,8 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                             filteredProductsResponseList = productsResponseList
                             homeRecyclerView.adapter = HomeAdapter(
                                 filteredProductsResponseList!!.filter { it.productType == "future" && it.contractType == "move_options" },
-                                requireActivity()
+                                requireActivity(),
+                                tickerResponseList
                             )
                         }
                     }
@@ -224,7 +246,8 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                             filteredProductsResponseList = productsResponseList
                             homeRecyclerView.adapter = HomeAdapter(
                                 filteredProductsResponseList!!.filter { it.productType == "inverse_future" && it.contractType == "interest_rate_swaps" },
-                                requireActivity()
+                                requireActivity(),
+                                tickerResponseList
                             )
                         }
                     }
@@ -261,7 +284,8 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                                                 "USDT".toRegex()
                                             )
                                         },
-                                        requireActivity()
+                                        requireActivity(),
+                                        tickerResponseList
                                     )
                                 }
                             }
@@ -276,7 +300,8 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                                                 "USDT".toRegex()
                                             )
                                         },
-                                        requireActivity()
+                                        requireActivity(),
+                                        tickerResponseList
                                     )
                                 }
                             }
@@ -288,7 +313,8 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                         if (null != productsResponseList) {
                             homeRecyclerView.adapter = HomeAdapter(
                                 filteredProductsResponseList!!.filter { it.productType == "future" && it.contractType == "move_options" },
-                                requireActivity()
+                                requireActivity(),
+                                tickerResponseList
                             )
                         }
                     }
@@ -298,7 +324,8 @@ class HomeFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
                         if (null != productsResponseList) {
                             homeRecyclerView.adapter = HomeAdapter(
                                 filteredProductsResponseList!!.filter { it.productType == "inverse_future" && it.contractType == "interest_rate_swaps" },
-                                requireActivity()
+                                requireActivity(),
+                                tickerResponseList
                             )
                         }
                     }
