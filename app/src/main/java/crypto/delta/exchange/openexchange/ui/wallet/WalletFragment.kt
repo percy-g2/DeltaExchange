@@ -50,40 +50,52 @@ class WalletFragment : BaseFragment() {
         walletAdapter = WalletAdapter(walletResponseList!!)
         walletRecyclerView.adapter = walletAdapter
 
-        val timeStamp = KotlinUtils.generateTimeStamp()
-        val method = "GET"
-        val path = "/wallet/balances"
-        val queryString = ""
-        val payload = ""
-        val signatureData = method + timeStamp + path + queryString + payload
-        val signature = KotlinUtils.generateSignature(
-            signatureData,
-            appPreferenceManager!!.apiSecret!!
-        )
-        walletViewModel.getWallet(appPreferenceManager!!.apiKey!!, timeStamp, signature!!)!!
-            .observe(viewLifecycleOwner, Observer {
-                if (it.code() == 200) {
-                    val myType = object : TypeToken<List<WalletResponse>>() {}.type
-                    val responseList =
-                        Gson().fromJson<List<WalletResponse>>(it.body()!!.charStream(), myType)
-                    walletResponseList!!.clear()
-                    walletResponseList!!.addAll(responseList)
-                    walletAdapter!!.notifyDataSetChanged()
-                    errorImage.visibility = View.GONE
-                } else {
-                    val errorBody = Gson().fromJson(
-                        it.errorBody()!!.charStream(),
-                        ErrorResponse::class.java
-                    )
-                    Toasty.error(
-                        requireContext(),
-                        errorBody.message!!,
-                        Toast.LENGTH_SHORT,
-                        true
-                    ).show()
-                    errorImage.visibility = View.VISIBLE
-                }
-                progressSpinner.visibility = View.GONE
-            })
+        if (!KotlinUtils.apiDetailsPresent(requireContext())) {
+            errorImage.visibility = View.VISIBLE
+            progressSpinner.visibility = View.GONE
+            Toasty.warning(
+                requireContext(),
+                resources.getString(R.string.configure_api_key_first),
+                Toast.LENGTH_SHORT,
+                true
+            ).show()
+        } else {
+            val timeStamp = KotlinUtils.generateTimeStamp()
+            val method = "GET"
+            val path = "/wallet/balances"
+            val queryString = ""
+            val payload = ""
+            val signatureData = method + timeStamp + path + queryString + payload
+            val signature = KotlinUtils.generateSignature(
+                signatureData,
+                appPreferenceManager!!.apiSecret!!
+            )
+
+            walletViewModel.getWallet(appPreferenceManager!!.apiKey!!, timeStamp, signature!!)!!
+                .observe(viewLifecycleOwner, Observer {
+                    if (it.code() == 200) {
+                        val myType = object : TypeToken<List<WalletResponse>>() {}.type
+                        val responseList =
+                            Gson().fromJson<List<WalletResponse>>(it.body()!!.charStream(), myType)
+                        walletResponseList!!.clear()
+                        walletResponseList!!.addAll(responseList)
+                        walletAdapter!!.notifyDataSetChanged()
+                        errorImage.visibility = View.GONE
+                    } else {
+                        val errorBody = Gson().fromJson(
+                            it.errorBody()!!.charStream(),
+                            ErrorResponse::class.java
+                        )
+                        Toasty.error(
+                            requireContext(),
+                            errorBody.message!!,
+                            Toast.LENGTH_SHORT,
+                            true
+                        ).show()
+                        errorImage.visibility = View.VISIBLE
+                    }
+                    progressSpinner.visibility = View.GONE
+                })
+        }
     }
 }
