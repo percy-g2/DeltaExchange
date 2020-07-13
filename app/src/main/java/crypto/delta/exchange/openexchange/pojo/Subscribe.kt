@@ -3,23 +3,32 @@ package crypto.delta.exchange.openexchange.pojo
 import com.squareup.moshi.Json
 
 class Subscribe(
-    @Json(name = "type")
+    @field:Json(name = "type")
     var type: String,
 
-    @Json(name = "payload")
+    @field:Json(name = "payload")
     var payload: Payload
 )
 
 class Payload {
-    @Json(name = "channels")
+    @field:Json(name = "channels")
     var channels: List<Channel>? = null
+
+    @field:Json(name = "api-key")
+    var apiKey: String? = null
+
+    @field:Json(name = "signature")
+    var signature: String? = null
+
+    @field:Json(name = "timestamp")
+    var timestamp: String? = null
 }
 
 
 class Channel {
-    @Json(name = "name")
+    @field:Json(name = "name")
     var name: String? = null
 
-    @Json(name = "symbols")
+    @field:Json(name = "symbols")
     var symbols: List<String>? = null
 }

@@ -4,14 +4,14 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "30.0.0"
+    buildToolsVersion "30.0.1"
 
     defaultConfig {
         applicationId "crypto.delta.exchange.openexchange"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 6
-        versionName "beta-1.1"
+        versionCode 7
+        versionName "beta-1.2"
        // ndk.abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
         externalNativeBuild {
             cmake {
@@ -20,6 +20,10 @@ android {
         }
         resConfigs "en"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    
+    buildFeatures{
+        viewBinding  = true
     }
 
     buildTypes {
@@ -38,8 +42,8 @@ android {
         }
         debug {
             versionNameSuffix '-debug'
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         android.applicationVariants.all { variant ->
@@ -140,6 +144,8 @@ dependencies {
     implementation 'com.github.GrenderG:Toasty:1.4.2'
 
     implementation "androidx.security:security-crypto:1.1.0-alpha01"
+
+    implementation 'com.github.mreram:showcaseview:1.1'
 
     implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.8'
     testImplementation 'junit:junit:4.13'

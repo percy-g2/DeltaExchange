@@ -7,6 +7,8 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
 import crypto.delta.exchange.openexchange.R
 import crypto.delta.exchange.openexchange.pojo.position.OpenPositionResponse
+import java.lang.String
+import java.util.*
 
 class PositionAdapter(private var ordersResponseList: List<OpenPositionResponse>) :
     RecyclerView.Adapter<PositionAdapter.ViewHolder>() {
@@ -33,8 +35,12 @@ class PositionAdapter(private var ordersResponseList: List<OpenPositionResponse>
         val ordersResponse = ordersResponseList[position]
         holder.contract.text = ordersResponse.product!!.symbol
         holder.quantity.text = ordersResponse.size!!.toString()
-        holder.entryPrice.text = ordersResponse.entryPrice
-        holder.liquidationPrice.text = ordersResponse.liquidationPrice
+        holder.entryPrice.text = String.format(
+            Locale.ENGLISH, "%.2f", ordersResponse.entryPrice.toDouble()
+        )
+        holder.liquidationPrice.text = String.format(
+            Locale.ENGLISH, "%.2f", ordersResponse.liquidationPrice.toDouble()
+        )
         holder.margin.text = ordersResponse.margin
 
     }

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".ui.order.OrderBookFragment">
 
@@ -11,6 +11,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/sellOrderBookRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".9" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
@@ -20,32 +27,64 @@
             android:weightSum="2">
 
             <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/lastPriceTxt"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:gravity="center"
+                android:layout_margin="2dp"
+                android:gravity="center|end"
                 android:minHeight="?android:attr/actionBarSize"
                 android:text="@string/last_price"
                 android:textColor="@color/primaryTextColor"
                 android:textStyle="bold" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/lastPriceTxt"
+                android:id="@+id/lastPriceValue"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:gravity="center"
+                android:layout_margin="2dp"
+                android:gravity="center|start"
                 android:minHeight="?android:attr/actionBarSize"
                 android:textColor="@color/primaryTextColor"
                 android:textStyle="bold"
                 tools:text="87786" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/sellOrderBookRecyclerView"
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight=".9" />
+            android:layout_weight=".2"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/markPriceTxt"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="2dp"
+                android:layout_weight="1"
+                android:drawableStart="@drawable/ic_baseline_help_outline_24"
+                android:drawablePadding="5dp"
+                android:drawableTint="@color/primaryTextColor"
+                android:gravity="center|end"
+                android:minHeight="?android:attr/actionBarSize"
+                android:text="@string/mark_price"
+                android:textColor="@color/primaryTextColor"
+                android:textStyle="bold" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/markPriceValue"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="2dp"
+                android:layout_weight="1"
+                android:gravity="center|start"
+                android:minHeight="?android:attr/actionBarSize"
+                android:textColor="@color/primaryTextColor"
+                android:textStyle="bold"
+                tools:text="87786" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/buyOrderBookRecyclerView"
@@ -59,8 +98,8 @@
         android:id="@+id/progressSpinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="8dp"
+        android:layout_gravity="center|top"
+        android:layout_marginTop="40dp"
         android:indeterminate="true"
         app:auto_start="true"
         app:dot_blinkingColor="@color/colorBid"

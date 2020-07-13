@@ -59,6 +59,21 @@ class AppPreferenceManager(private val context: Context) {
             .apply()
     }
 
+    val productSymbolsList: MutableSet<String>?
+        get() = prefs.getStringSet(
+            context.resources.getString(R.string.product_symbols_list_preference),
+            mutableSetOf()
+        )
+
+    fun setProductSymbolsList(value: MutableSet<String>?) {
+        prefs.edit()
+            .putStringSet(
+                context.resources.getString(R.string.product_symbols_list_preference),
+                value!!
+            )
+            .apply()
+    }
+
     private fun getEncryptedSharedPreferences(): SharedPreferences? {
 
         val spec = KeyGenParameterSpec.Builder(

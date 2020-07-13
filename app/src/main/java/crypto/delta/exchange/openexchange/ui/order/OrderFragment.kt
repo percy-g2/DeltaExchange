@@ -6,8 +6,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.widget.AdapterView
+import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -20,6 +23,7 @@ import com.warkiz.tickseekbar.SeekParams
 import com.warkiz.tickseekbar.TickSeekBar
 import crypto.delta.exchange.openexchange.R
 import crypto.delta.exchange.openexchange.api.NoConnectivityException
+import crypto.delta.exchange.openexchange.databinding.CreateOrderBinding
 import crypto.delta.exchange.openexchange.pojo.ErrorResponse
 import crypto.delta.exchange.openexchange.pojo.order.ChangeOrderLeverageBody
 import crypto.delta.exchange.openexchange.pojo.order.CreateOrderRequest
@@ -112,7 +116,7 @@ class OrderFragment : BaseFragment() {
                 btnPlaceOrder.backgroundTintList =
                     ContextCompat.getColorStateList(requireContext(), R.color.gray)
             }
-            var leverageChangedByUser = false
+
             val progressBar = KotlinUtils.showProgressBar(
                 requireActivity(),
                 requireContext().resources.getString(R.string.please_wait)
@@ -148,37 +152,13 @@ class OrderFragment : BaseFragment() {
                                 response.body()!!.charStream(),
                                 OrderLeverageResponse::class.java
                             )
-                            when {
-                                orderLeverageResponse.leverage.toDouble() == 1.0 -> {
-                                    leverageSeeker.setProgress(0f)
-                                }
-                                orderLeverageResponse.leverage.toDouble() == 2.0 -> {
-                                    leverageSeeker.setProgress(14f)
-                                }
-                                orderLeverageResponse.leverage.toDouble() == 3.0 -> {
-                                    leverageSeeker.setProgress(29f)
-                                }
-                                orderLeverageResponse.leverage.toDouble() == 5.0 -> {
-                                    leverageSeeker.setProgress(43f)
-                                }
-                                orderLeverageResponse.leverage.toDouble() == 10.0 -> {
-                                    leverageSeeker.setProgress(57f)
-                                }
-                                orderLeverageResponse.leverage.toDouble() == 25.0 -> {
-                                    leverageSeeker.setProgress(71f)
-                                }
-                                orderLeverageResponse.leverage.toDouble() == 50.0 -> {
-                                    leverageSeeker.setProgress(86f)
-                                }
-                                orderLeverageResponse.leverage.toDouble() == 100.0 -> {
-                                    leverageSeeker.setProgress(100f)
-                                }
-                            }
 
-                            leverageTxt.text =
-                                orderLeverageResponse.leverage.toDouble().toInt().toString()
-                                    .plus("x")
-                            leverageChangedByUser = true
+
+                            currentLeverage.text =
+                                resources.getString(R.string.current_leverage).plus(
+                                    orderLeverageResponse.leverage.toDouble().toInt().toString()
+                                        .plus("x")
+                                )
                             Toasty.success(
                                 requireContext(),
                                 requireContext().getString(R.string.order_leverage_updated),
@@ -186,20 +166,6 @@ class OrderFragment : BaseFragment() {
                                 true
                             ).show()
                             if (buyAndSellSwitch.isChecked) {
-                                buyAndSellSwitch.text =
-                                    requireContext().resources.getString(R.string.sell_short)
-                                buyAndSellSwitch.setTextColor(
-                                    ContextCompat.getColor(
-                                        requireContext(),
-                                        R.color.colorAsk
-                                    )
-                                )
-                                btnPlaceOrder.backgroundTintList =
-                                    ContextCompat.getColorStateList(
-                                        requireContext(),
-                                        R.color.colorAsk
-                                    )
-                            } else {
                                 buyAndSellSwitch.text =
                                     requireContext().resources.getString(R.string.buy_long)
                                 buyAndSellSwitch.setTextColor(
@@ -212,6 +178,20 @@ class OrderFragment : BaseFragment() {
                                     ContextCompat.getColorStateList(
                                         requireContext(),
                                         R.color.colorBid
+                                    )
+                            } else {
+                                buyAndSellSwitch.text =
+                                    requireContext().resources.getString(R.string.sell_short)
+                                buyAndSellSwitch.setTextColor(
+                                    ContextCompat.getColor(
+                                        requireContext(),
+                                        R.color.colorAsk
+                                    )
+                                )
+                                btnPlaceOrder.backgroundTintList =
+                                    ContextCompat.getColorStateList(
+                                        requireContext(),
+                                        R.color.colorAsk
                                     )
                             }
                         } else {
@@ -270,7 +250,6 @@ class OrderFragment : BaseFragment() {
                         btnPlaceOrder.backgroundTintList =
                             ContextCompat.getColorStateList(requireContext(), R.color.gray)
                         progressBar.dismiss()
-                        leverageChangedByUser = true
                     }
                 })
             } else {
@@ -283,104 +262,9 @@ class OrderFragment : BaseFragment() {
                 ).show()
             }
 
-            orderTypeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-
-                }
-
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    when (orderTypeSpinner.selectedItem.toString()) {
-                        "Limit" -> {
-                            edtLimitPrice.visibility = View.VISIBLE
-                            edtLimitPrice.hint = resources.getString(R.string.limit_price)
-                            tifLayout.visibility = View.VISIBLE
-                            checkPostOnly.visibility = View.VISIBLE
-                            edtStopPrice.visibility = View.GONE
-                        }
-                        "Market" -> {
-                            edtLimitPrice.visibility = View.GONE
-                            tifLayout.visibility = View.GONE
-                            checkPostOnly.visibility = View.GONE
-                            edtStopPrice.visibility = View.GONE
-                        }
-                        "Stop Market" -> {
-                            edtLimitPrice.visibility = View.GONE
-                            edtStopPrice.visibility = View.VISIBLE
-                            tifLayout.visibility = View.GONE
-                            checkPostOnly.visibility = View.GONE
-                        }
-                        "Stop Limit" -> {
-                            edtLimitPrice.visibility = View.VISIBLE
-                            edtStopPrice.visibility = View.VISIBLE
-                            tifLayout.visibility = View.GONE
-                            checkPostOnly.visibility = View.GONE
-                        }
-                        "Trailing Stop" -> {
-                            edtLimitPrice.visibility = View.VISIBLE
-                            edtLimitPrice.hint = resources.getString(R.string.trailing_amount)
-                            tifLayout.visibility = View.GONE
-                            checkPostOnly.visibility = View.GONE
-                            edtStopPrice.visibility = View.GONE
-                        }
-                    }
-                }
-
-            }
-
-            when (orderTypeSpinner.selectedItem.toString()) {
-                "Limit" -> {
-                    edtLimitPrice.visibility = View.VISIBLE
-                    edtLimitPrice.hint = resources.getString(R.string.limit_price)
-                    tifLayout.visibility = View.VISIBLE
-                    checkPostOnly.visibility = View.VISIBLE
-                    edtStopPrice.visibility = View.GONE
-                }
-                "Market" -> {
-                    edtLimitPrice.visibility = View.GONE
-                    tifLayout.visibility = View.GONE
-                    checkPostOnly.visibility = View.GONE
-                    edtStopPrice.visibility = View.GONE
-                }
-                "Stop Market" -> {
-                    edtLimitPrice.visibility = View.GONE
-                    edtStopPrice.visibility = View.VISIBLE
-                    tifLayout.visibility = View.GONE
-                    checkPostOnly.visibility = View.GONE
-                }
-                "Stop Limit" -> {
-                    edtLimitPrice.visibility = View.VISIBLE
-                    edtStopPrice.visibility = View.VISIBLE
-                    tifLayout.visibility = View.GONE
-                    checkPostOnly.visibility = View.GONE
-                }
-                "Trailing Stop" -> {
-                    edtLimitPrice.visibility = View.VISIBLE
-                    edtLimitPrice.hint = resources.getString(R.string.trailing_amount)
-                    tifLayout.visibility = View.GONE
-                    checkPostOnly.visibility = View.GONE
-                    edtStopPrice.visibility = View.GONE
-                }
-            }
-
             if (KotlinUtils.apiDetailsPresent(requireContext())) {
                 buyAndSellSwitch.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {
-                        buyAndSellSwitch.text =
-                            requireContext().resources.getString(R.string.sell_short)
-                        buyAndSellSwitch.setTextColor(
-                            ContextCompat.getColor(
-                                requireContext(),
-                                R.color.colorAsk
-                            )
-                        )
-                        btnPlaceOrder.backgroundTintList =
-                            ContextCompat.getColorStateList(requireContext(), R.color.colorAsk)
-                    } else {
                         buyAndSellSwitch.text =
                             requireContext().resources.getString(R.string.buy_long)
                         buyAndSellSwitch.setTextColor(
@@ -391,523 +275,795 @@ class OrderFragment : BaseFragment() {
                         )
                         btnPlaceOrder.backgroundTintList =
                             ContextCompat.getColorStateList(requireContext(), R.color.colorBid)
-                    }
-                }
-            }
-
-            leverageSeeker.onSeekChangeListener = object : OnSeekChangeListener {
-                override fun onSeeking(seekParams: SeekParams) {
-                    Log.i(logTag, seekParams.seekBar.toString())
-                    Log.i(logTag, seekParams.progress.toString())
-                    Log.i(logTag, seekParams.progressFloat.toString())
-                    Log.i(logTag, seekParams.fromUser.toString())
-                    //when tick count > 0
-                    Log.i(logTag, seekParams.thumbPosition.toString())
-                    Log.i(logTag, seekParams.tickText)
-                    leverageTxt.text = seekParams.tickText
-
-                    if (leverageChangedByUser) {
-                        val changeOrderLeverageBody = ChangeOrderLeverageBody()
-                        changeOrderLeverageBody.productId =
-                            appPreferenceManager!!.currentProductId!!.toInt()
-                        when (seekParams.progress) {
-                            0 -> {
-                                changeOrderLeverageBody.leverage = "1.0"
-                            }
-                            14 -> {
-                                changeOrderLeverageBody.leverage = "2.0"
-                            }
-                            29 -> {
-                                changeOrderLeverageBody.leverage = "3.0"
-                            }
-                            43 -> {
-                                changeOrderLeverageBody.leverage = "5.0"
-                            }
-                            57 -> {
-                                changeOrderLeverageBody.leverage = "10.0"
-                            }
-                            71 -> {
-                                changeOrderLeverageBody.leverage = "25.0"
-                            }
-                            86 -> {
-                                changeOrderLeverageBody.leverage = "50.0"
-                            }
-                            100 -> {
-                                changeOrderLeverageBody.leverage = "100.0"
-                            }
-                        }
-
-                        val timeStampSetOrderLeverage = KotlinUtils.generateTimeStamp()
-                        val methodSetOrderLeverage = "POST"
-                        val pathSetOrderLeverage = "/orders/leverage"
-                        val queryStringSetOrderLeverage = ""
-                        val gson = Gson()
-                        val payloadSetOrderLeverage =
-                            gson.toJson(changeOrderLeverageBody).toString()
-                        val signatureDataSetOrderLeverage =
-                            methodSetOrderLeverage + timeStampSetOrderLeverage + pathSetOrderLeverage + queryStringSetOrderLeverage + payloadSetOrderLeverage
-                        val signatureSetOrderLeverage = KotlinUtils.generateSignature(
-                            signatureDataSetOrderLeverage,
-                            appPreferenceManager!!.apiSecret!!
+                    } else {
+                        buyAndSellSwitch.text =
+                            requireContext().resources.getString(R.string.sell_short)
+                        buyAndSellSwitch.setTextColor(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.colorAsk
+                            )
                         )
-
-                        progressBar.show()
-                        val observeOrderLeverage = service!!.setOrderLeverage(
-                            appPreferenceManager!!.apiKey!!,
-                            timeStampSetOrderLeverage,
-                            signatureSetOrderLeverage!!,
-                            changeOrderLeverageBody
-                        )
-
-                        observeOrderLeverage.enqueue(object :
-                            Callback<ResponseBody?> {
-                            override fun onResponse(
-                                call: Call<ResponseBody?>?,
-                                response: Response<ResponseBody?>
-                            ) {
-                                if (response.code() == 200) {
-                                    Toasty.success(
-                                        requireContext(),
-                                        requireContext().getString(R.string.order_leverage_changed_successfully),
-                                        Toast.LENGTH_SHORT,
-                                        true
-                                    ).show()
-                                } else {
-                                    val errorBody = Gson().fromJson(
-                                        response.errorBody()!!.charStream(),
-                                        ErrorResponse::class.java
-                                    )
-                                    Toasty.error(
-                                        requireContext(),
-                                        errorBody.message!!,
-                                        Toast.LENGTH_SHORT,
-                                        true
-                                    ).show()
-                                }
-                                progressBar.dismiss()
-                            }
-
-                            override fun onFailure(call: Call<ResponseBody?>?, error: Throwable?) {
-                                when (error) {
-                                    is NoConnectivityException -> {
-                                        Toasty.info(
-                                            requireContext(),
-                                            requireContext().getString(R.string.active_network_connection_required),
-                                            Toast.LENGTH_SHORT,
-                                            true
-                                        ).show()
-                                    }
-                                    is ConnectException -> {
-                                        Toasty.error(
-                                            requireContext(),
-                                            requireContext().getString(R.string.server_not_responding),
-                                            Toast.LENGTH_SHORT,
-                                            true
-                                        ).show()
-                                    }
-                                    is SocketTimeoutException -> {
-                                        Toasty.error(
-                                            requireContext(),
-                                            requireContext().getString(R.string.connection_timeout),
-                                            Toast.LENGTH_SHORT,
-                                            true
-                                        ).show()
-                                    }
-                                    else -> {
-                                        Toasty.error(
-                                            requireContext(),
-                                            requireContext().getString(R.string.something_wrong),
-                                            Toast.LENGTH_SHORT,
-                                            true
-                                        ).show()
-                                        error!!.printStackTrace()
-                                    }
-                                }
-                                progressBar.dismiss()
-                            }
-                        })
+                        btnPlaceOrder.backgroundTintList =
+                            ContextCompat.getColorStateList(requireContext(), R.color.colorAsk)
                     }
-                }
-
-                override fun onStartTrackingTouch(seekBar: TickSeekBar?) {}
-                override fun onStopTrackingTouch(seekBar: TickSeekBar?) {}
-            }
-
-            checkPostOnly.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked && !checkedGTC.isChecked) {
-                    checkPostOnly.isChecked = false
-                    Toasty.error(
-                        requireContext(),
-                        requireContext().getString(R.string.post_only_flag_is_for_gtc),
-                        Toast.LENGTH_SHORT,
-                        true
-                    ).show()
-                }
-            }
-
-            checkedFOK.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked && checkPostOnly.isChecked) {
-                    checkPostOnly.isChecked = false
-                    Toasty.error(
-                        requireContext(),
-                        requireContext().getString(R.string.post_only_flag_is_for_gtc),
-                        Toast.LENGTH_SHORT,
-                        true
-                    ).show()
-                }
-            }
-
-            checkedIOC.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked && checkPostOnly.isChecked) {
-                    checkPostOnly.isChecked = false
-                    Toasty.error(
-                        requireContext(),
-                        requireContext().getString(R.string.post_only_flag_is_for_gtc),
-                        Toast.LENGTH_SHORT,
-                        true
-                    ).show()
                 }
             }
 
             btnPlaceOrder.setOnClickListener {
-                if (orderTypeSpinner.selectedItem.toString().equals("Limit", true)) {
-                    if (edtLimitPrice.text!!.isNotEmpty() && edtQuantity.text!!.isNotEmpty()) {
-                        if (edtLimitPrice.text!!.toString()
-                                .toDouble() != 0.0 && edtQuantity.text!!.toString()
-                                .toDouble() != 0.0
-                        ) {
-                            val createOrderRequest = CreateOrderRequest()
-                            createOrderRequest.orderType =
-                                CreateOrderRequest.OrderType.limit_order
-                            if (buyAndSellSwitch.isChecked) {
-                                createOrderRequest.side = CreateOrderRequest.Side.sell
-                            } else {
-                                createOrderRequest.side = CreateOrderRequest.Side.buy
-                            }
-                            createOrderRequest.productId =
-                                appPreferenceManager!!.currentProductId!!.toInt()
-                            createOrderRequest.limitPrice = edtLimitPrice.text.toString()
-                            createOrderRequest.size = edtQuantity.text.toString().toInt()
-                            when {
-                                checkedGTC.isChecked -> {
-                                    createOrderRequest.timeInForce =
-                                        CreateOrderRequest.TimeInForce.gtc
-                                }
-                                checkedFOK.isChecked -> {
-                                    createOrderRequest.timeInForce =
-                                        CreateOrderRequest.TimeInForce.fok
-                                }
-                                checkedIOC.isChecked -> {
-                                    createOrderRequest.timeInForce =
-                                        CreateOrderRequest.TimeInForce.ioc
-                                }
-                            }
-                            if (checkPostOnly.isChecked) {
-                                createOrderRequest.postOnly = "true"
-                            } else {
-                                createOrderRequest.postOnly = "false"
-                            }
-                            if (checkReduceOnly.isChecked) {
-                                createOrderRequest.reduceOnly = "true"
-                            } else {
-                                createOrderRequest.reduceOnly = "false"
-                            }
-                            CoroutineScope(Dispatchers.Main).launch {
-                                placeOrder(createOrderRequest)
-                            }
+                if (edtPrice.text!!.isNotEmpty() && edtQuantity.text!!.isNotEmpty()) {
+                    if (edtPrice.text!!.toString()
+                            .toDouble() != 0.0 && edtQuantity.text!!.toString()
+                            .toDouble() != 0.0
+                    ) {
+                        val createOrderRequest = CreateOrderRequest()
+                        createOrderRequest.orderType =
+                            CreateOrderRequest.OrderType.limit_order
+                        if (buyAndSellSwitch.isChecked) {
+                            createOrderRequest.side = CreateOrderRequest.Side.sell
                         } else {
-                            if (edtLimitPrice.text.toString().toDouble() == 0.0) {
-                                Toasty.error(
-                                    requireContext(),
-                                    requireContext().getString(R.string.limit_price_is_zero),
-                                    Toast.LENGTH_SHORT,
-                                    true
-                                ).show()
-                            }
-                            if (edtQuantity.text.toString().toDouble() == 0.0) {
-                                Toasty.error(
-                                    requireContext(),
-                                    requireContext().getString(R.string.quantity_is_zero),
-                                    Toast.LENGTH_SHORT,
-                                    true
-                                ).show()
-                            }
+                            createOrderRequest.side = CreateOrderRequest.Side.buy
+                        }
+                        createOrderRequest.productId =
+                            appPreferenceManager!!.currentProductId!!.toInt()
+                        createOrderRequest.limitPrice = edtPrice.text.toString()
+                        createOrderRequest.size = edtQuantity.text.toString().toInt()
+                        createOrderRequest.timeInForce =
+                            CreateOrderRequest.TimeInForce.gtc
+                        createOrderRequest.postOnly = "false"
+                        createOrderRequest.reduceOnly = "false"
+                        CoroutineScope(Dispatchers.Main).launch {
+                            placeOrder(createOrderRequest, false, null)
                         }
                     } else {
-                        if (edtLimitPrice.text.isNullOrEmpty()) {
+                        if (edtPrice.text.toString().toDouble() == 0.0) {
                             Toasty.error(
                                 requireContext(),
-                                requireContext().getString(R.string.limit_price_is_empty),
+                                requireContext().getString(R.string.price_is_zero),
                                 Toast.LENGTH_SHORT,
                                 true
                             ).show()
                         }
-                        if (edtQuantity.text.isNullOrEmpty()) {
+                        if (edtQuantity.text.toString().toDouble() == 0.0) {
                             Toasty.error(
                                 requireContext(),
-                                requireContext().getString(R.string.quantity_is_empty),
+                                requireContext().getString(R.string.quantity_is_zero),
                                 Toast.LENGTH_SHORT,
                                 true
                             ).show()
                         }
                     }
-                } else if (orderTypeSpinner.selectedItem.toString().equals("Market", true)) {
-                    if (edtQuantity.text!!.isNotEmpty()) {
-                        if (edtQuantity.text!!.toString().toDouble() != 0.0) {
-                            val createOrderRequest = CreateOrderRequest()
-                            createOrderRequest.orderType =
-                                CreateOrderRequest.OrderType.market_order
-                            if (buyAndSellSwitch.isChecked) {
-                                createOrderRequest.side = CreateOrderRequest.Side.sell
-                            } else {
-                                createOrderRequest.side = CreateOrderRequest.Side.buy
-                            }
-                            createOrderRequest.productId =
-                                appPreferenceManager!!.currentProductId!!.toInt()
-                            createOrderRequest.size = edtQuantity.text.toString().toInt()
-                            if (checkReduceOnly.isChecked) {
-                                createOrderRequest.reduceOnly = "true"
-                            } else {
-                                createOrderRequest.reduceOnly = "false"
-                            }
-                            CoroutineScope(Dispatchers.Main).launch {
-                                placeOrder(createOrderRequest)
-                            }
-                        } else {
-                            if (edtQuantity.text.toString().toDouble() == 0.0) {
-                                Toasty.error(
-                                    requireContext(),
-                                    requireContext().getString(R.string.quantity_is_zero),
-                                    Toast.LENGTH_SHORT,
-                                    true
-                                ).show()
-                            }
-                        }
-                    } else {
-                        if (edtQuantity.text.isNullOrEmpty()) {
-                            Toasty.error(
-                                requireContext(),
-                                requireContext().getString(R.string.quantity_is_empty),
-                                Toast.LENGTH_SHORT,
-                                true
-                            ).show()
-                        }
+                } else {
+                    if (edtPrice.text.isNullOrEmpty()) {
+                        Toasty.error(
+                            requireContext(),
+                            requireContext().getString(R.string.price_is_empty),
+                            Toast.LENGTH_SHORT,
+                            true
+                        ).show()
                     }
-                } else if (orderTypeSpinner.selectedItem.toString().equals("Stop Limit", true)) {
-                    if (edtLimitPrice.text!!.isNotEmpty() && edtQuantity.text!!.isNotEmpty()) {
-                        if (edtLimitPrice.text!!.toString()
-                                .toDouble() != 0.0 && edtQuantity.text!!.toString()
-                                .toDouble() != 0.0
-                        ) {
-                            val createOrderRequest = CreateOrderRequest()
-                            createOrderRequest.orderType =
-                                CreateOrderRequest.OrderType.limit_order
-                            if (buyAndSellSwitch.isChecked) {
-                                createOrderRequest.side = CreateOrderRequest.Side.sell
-                            } else {
-                                createOrderRequest.side = CreateOrderRequest.Side.buy
-                            }
-                            createOrderRequest.productId =
-                                appPreferenceManager!!.currentProductId!!.toInt()
-                            createOrderRequest.limitPrice = edtLimitPrice.text.toString()
-                            createOrderRequest.stopPrice = edtStopPrice.text.toString()
-                            createOrderRequest.size = edtQuantity.text.toString().toInt()
-                            createOrderRequest.stopOrderType = "stop_loss_order"
-                            if (checkReduceOnly.isChecked) {
-                                createOrderRequest.reduceOnly = "true"
-                            } else {
-                                createOrderRequest.reduceOnly = "false"
-                            }
-                            CoroutineScope(Dispatchers.Main).launch {
-                                placeOrder(createOrderRequest)
-                            }
-                        } else {
-                            if (edtLimitPrice.text.toString().toDouble() == 0.0) {
-                                Toasty.error(
-                                    requireContext(),
-                                    requireContext().getString(R.string.limit_price_is_zero),
-                                    Toast.LENGTH_SHORT,
-                                    true
-                                ).show()
-                            }
-                            if (edtStopPrice.text.toString().toDouble() == 0.0) {
-                                Toasty.error(
-                                    requireContext(),
-                                    requireContext().getString(R.string.stop_price_is_zero),
-                                    Toast.LENGTH_SHORT,
-                                    true
-                                ).show()
-                            }
-                            if (edtQuantity.text.toString().toDouble() == 0.0) {
-                                Toasty.error(
-                                    requireContext(),
-                                    requireContext().getString(R.string.quantity_is_zero),
-                                    Toast.LENGTH_SHORT,
-                                    true
-                                ).show()
-                            }
-                        }
-                    } else {
-                        if (edtLimitPrice.text.isNullOrEmpty()) {
-                            Toasty.error(
-                                requireContext(),
-                                requireContext().getString(R.string.limit_price_is_empty),
-                                Toast.LENGTH_SHORT,
-                                true
-                            ).show()
-                        }
-                        if (edtStopPrice.text.isNullOrEmpty()) {
-                            Toasty.error(
-                                requireContext(),
-                                requireContext().getString(R.string.stop_price_is_empty),
-                                Toast.LENGTH_SHORT,
-                                true
-                            ).show()
-                        }
-                        if (edtQuantity.text.isNullOrEmpty()) {
-                            Toasty.error(
-                                requireContext(),
-                                requireContext().getString(R.string.quantity_is_empty),
-                                Toast.LENGTH_SHORT,
-                                true
-                            ).show()
-                        }
-                    }
-                } else if (orderTypeSpinner.selectedItem.toString().equals("Stop Market", true)) {
-                    if (edtStopPrice.text!!.isNotEmpty() && edtQuantity.text!!.isNotEmpty()) {
-                        if (edtLimitPrice.text!!.toString()
-                                .toDouble() != 0.0 && edtQuantity.text!!.toString()
-                                .toDouble() != 0.0
-                        ) {
-                            val createOrderRequest = CreateOrderRequest()
-                            createOrderRequest.orderType =
-                                CreateOrderRequest.OrderType.market_order
-                            if (buyAndSellSwitch.isChecked) {
-                                createOrderRequest.side = CreateOrderRequest.Side.sell
-                            } else {
-                                createOrderRequest.side = CreateOrderRequest.Side.buy
-                            }
-                            createOrderRequest.productId =
-                                appPreferenceManager!!.currentProductId!!.toInt()
-                            createOrderRequest.stopPrice = edtStopPrice.text.toString()
-                            createOrderRequest.size = edtQuantity.text.toString().toInt()
-                            createOrderRequest.closeOnTrigger = "false"
-                            createOrderRequest.stopOrderType = "stop_loss_order"
-                            if (checkReduceOnly.isChecked) {
-                                createOrderRequest.reduceOnly = "true"
-                            } else {
-                                createOrderRequest.reduceOnly = "false"
-                            }
-                            CoroutineScope(Dispatchers.Main).launch {
-                                placeOrder(createOrderRequest)
-                            }
-                        } else {
-                            if (edtStopPrice.text.toString().toDouble() == 0.0) {
-                                Toasty.error(
-                                    requireContext(),
-                                    requireContext().getString(R.string.stop_price_is_zero),
-                                    Toast.LENGTH_SHORT,
-                                    true
-                                ).show()
-                            }
-                            if (edtQuantity.text.toString().toDouble() == 0.0) {
-                                Toasty.error(
-                                    requireContext(),
-                                    requireContext().getString(R.string.quantity_is_zero),
-                                    Toast.LENGTH_SHORT,
-                                    true
-                                ).show()
-                            }
-                        }
-                    } else {
-                        if (edtStopPrice.text.isNullOrEmpty()) {
-                            Toasty.error(
-                                requireContext(),
-                                requireContext().getString(R.string.stop_price_is_empty),
-                                Toast.LENGTH_SHORT,
-                                true
-                            ).show()
-                        }
-                        if (edtQuantity.text.isNullOrEmpty()) {
-                            Toasty.error(
-                                requireContext(),
-                                requireContext().getString(R.string.quantity_is_empty),
-                                Toast.LENGTH_SHORT,
-                                true
-                            ).show()
-                        }
-                    }
-                } else if (orderTypeSpinner.selectedItem.toString().equals("Trailing Stop", true)) {
-                    if (edtLimitPrice.text!!.isNotEmpty() && edtQuantity.text!!.isNotEmpty()) {
-                        if (edtLimitPrice.text!!.toString()
-                                .toDouble() != 0.0 && edtQuantity.text!!.toString()
-                                .toDouble() != 0.0
-                        ) {
-                            val createOrderRequest = CreateOrderRequest()
-                            createOrderRequest.orderType =
-                                CreateOrderRequest.OrderType.market_order
-                            if (buyAndSellSwitch.isChecked) {
-                                createOrderRequest.side = CreateOrderRequest.Side.sell
-                            } else {
-                                createOrderRequest.side = CreateOrderRequest.Side.buy
-                            }
-                            createOrderRequest.productId =
-                                appPreferenceManager!!.currentProductId!!.toInt()
-                            createOrderRequest.trailAmount = edtLimitPrice.text.toString()
-                            createOrderRequest.size = edtQuantity.text.toString().toInt()
-                            createOrderRequest.closeOnTrigger = "false"
-                            createOrderRequest.stopOrderType = "stop_loss_order"
-                            if (checkReduceOnly.isChecked) {
-                                createOrderRequest.reduceOnly = "true"
-                            } else {
-                                createOrderRequest.reduceOnly = "false"
-                            }
-                            CoroutineScope(Dispatchers.Main).launch {
-                                placeOrder(createOrderRequest)
-                            }
-                        } else {
-                            if (edtLimitPrice.text.toString().toDouble() == 0.0) {
-                                Toasty.error(
-                                    requireContext(),
-                                    requireContext().getString(R.string.trailing_amount_is_zero),
-                                    Toast.LENGTH_SHORT,
-                                    true
-                                ).show()
-                            }
-                            if (edtQuantity.text.toString().toDouble() == 0.0) {
-                                Toasty.error(
-                                    requireContext(),
-                                    requireContext().getString(R.string.quantity_is_zero),
-                                    Toast.LENGTH_SHORT,
-                                    true
-                                ).show()
-                            }
-                        }
-                    } else {
-                        if (edtLimitPrice.text.isNullOrEmpty()) {
-                            Toasty.error(
-                                requireContext(),
-                                requireContext().getString(R.string.trailing_amount_is_empty),
-                                Toast.LENGTH_SHORT,
-                                true
-                            ).show()
-                        }
-                        if (edtQuantity.text.isNullOrEmpty()) {
-                            Toasty.error(
-                                requireContext(),
-                                requireContext().getString(R.string.quantity_is_empty),
-                                Toast.LENGTH_SHORT,
-                                true
-                            ).show()
-                        }
+                    if (edtQuantity.text.isNullOrEmpty()) {
+                        Toasty.error(
+                            requireContext(),
+                            requireContext().getString(R.string.quantity_is_empty),
+                            Toast.LENGTH_SHORT,
+                            true
+                        ).show()
                     }
                 }
+            }
+            showAdvancedOrderForm.setOnClickListener {
+                openAdvanceOrderDialog()
             }
             dialog.dismiss()
         }
     }
 
-    private suspend fun placeOrder(createOrderRequest: CreateOrderRequest) {
+    private fun openAdvanceOrderDialog() {
+
+        val dialog = AlertDialog.Builder(requireContext(), R.style.createOrderDialog).create()
+
+        val createOrderBinding = CreateOrderBinding.inflate(dialog.layoutInflater)
+        dialog.setView(createOrderBinding.root)
+
+        val window: Window = dialog.window!!
+        window.setLayout(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        dialog.show()
+
+        if (KotlinUtils.apiDetailsPresent(requireContext())) {
+            val currentLeverageValue =
+                currentLeverage.text.toString().replace("[^0-9]".toRegex(), "")
+            createOrderBinding.leverageTxt.text =
+                currentLeverage.text.toString().replace("[^0-9]".toRegex(), "")
+                    .plus("x")
+            when {
+                currentLeverageValue.toDouble() == 1.0 -> {
+                    createOrderBinding.leverageSeeker.setProgress(0f)
+                }
+                currentLeverageValue.toDouble() == 2.0 -> {
+                    createOrderBinding.leverageSeeker.setProgress(14f)
+                }
+                currentLeverageValue.toDouble() == 3.0 -> {
+                    createOrderBinding.leverageSeeker.setProgress(29f)
+                }
+                currentLeverageValue.toDouble() == 5.0 -> {
+                    createOrderBinding.leverageSeeker.setProgress(43f)
+                }
+                currentLeverageValue.toDouble() == 10.0 -> {
+                    createOrderBinding.leverageSeeker.setProgress(57f)
+                }
+                currentLeverageValue.toDouble() == 25.0 -> {
+                    createOrderBinding.leverageSeeker.setProgress(71f)
+                }
+                currentLeverageValue.toDouble() == 50.0 -> {
+                    createOrderBinding.leverageSeeker.setProgress(86f)
+                }
+                currentLeverageValue.toDouble() == 100.0 -> {
+                    createOrderBinding.leverageSeeker.setProgress(100f)
+                }
+            }
+        } else {
+            Toasty.warning(
+                requireContext(),
+                requireContext().getString(R.string.api_details_error),
+                Toast.LENGTH_SHORT,
+                true
+            ).show()
+        }
+
+        createOrderBinding.orderTypeSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                }
+
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    when (createOrderBinding.orderTypeSpinner.selectedItem.toString()) {
+                        "Limit" -> {
+                            createOrderBinding.edtLimitPrice.visibility = View.VISIBLE
+                            createOrderBinding.edtLimitPriceTextInputLayout.hint =
+                                resources.getString(R.string.limit_price)
+                            createOrderBinding.tifLayout.visibility = View.VISIBLE
+                            createOrderBinding.checkPostOnly.visibility = View.VISIBLE
+                            createOrderBinding.edtStopPriceTextInputLayout.visibility = View.GONE
+                        }
+                        "Market" -> {
+                            createOrderBinding.edtLimitPrice.visibility = View.GONE
+                            createOrderBinding.tifLayout.visibility = View.GONE
+                            createOrderBinding.checkPostOnly.visibility = View.GONE
+                            createOrderBinding.edtStopPriceTextInputLayout.visibility = View.GONE
+                        }
+                        "Stop Market" -> {
+                            createOrderBinding.edtLimitPrice.visibility = View.GONE
+                            createOrderBinding.edtStopPriceTextInputLayout.visibility = View.VISIBLE
+                            createOrderBinding.tifLayout.visibility = View.GONE
+                            createOrderBinding.checkPostOnly.visibility = View.GONE
+                        }
+                        "Stop Limit" -> {
+                            createOrderBinding.edtLimitPrice.visibility = View.VISIBLE
+                            createOrderBinding.edtStopPriceTextInputLayout.visibility = View.VISIBLE
+                            createOrderBinding.tifLayout.visibility = View.GONE
+                            createOrderBinding.checkPostOnly.visibility = View.GONE
+                        }
+                        "Trailing Stop" -> {
+                            createOrderBinding.edtLimitPrice.visibility = View.VISIBLE
+                            createOrderBinding.edtLimitPriceTextInputLayout.hint =
+                                resources.getString(R.string.trailing_amount)
+                            createOrderBinding.tifLayout.visibility = View.GONE
+                            createOrderBinding.checkPostOnly.visibility = View.GONE
+                            createOrderBinding.edtStopPriceTextInputLayout.visibility = View.GONE
+                        }
+                    }
+                }
+
+            }
+
+        when (createOrderBinding.orderTypeSpinner.selectedItem.toString()) {
+            "Limit" -> {
+                createOrderBinding.edtLimitPrice.visibility = View.VISIBLE
+                createOrderBinding.edtLimitPriceTextInputLayout.hint =
+                    resources.getString(R.string.limit_price)
+                createOrderBinding.tifLayout.visibility = View.VISIBLE
+                createOrderBinding.checkPostOnly.visibility = View.VISIBLE
+                createOrderBinding.edtStopPriceTextInputLayout.visibility = View.GONE
+            }
+            "Market" -> {
+                createOrderBinding.edtLimitPrice.visibility = View.GONE
+                createOrderBinding.tifLayout.visibility = View.GONE
+                createOrderBinding.checkPostOnly.visibility = View.GONE
+                createOrderBinding.edtStopPriceTextInputLayout.visibility = View.GONE
+            }
+            "Stop Market" -> {
+                createOrderBinding.edtLimitPrice.visibility = View.GONE
+                createOrderBinding.edtStopPriceTextInputLayout.visibility = View.VISIBLE
+                createOrderBinding.tifLayout.visibility = View.GONE
+                createOrderBinding.checkPostOnly.visibility = View.GONE
+            }
+            "Stop Limit" -> {
+                createOrderBinding.edtLimitPrice.visibility = View.VISIBLE
+                createOrderBinding.edtStopPriceTextInputLayout.visibility = View.VISIBLE
+                createOrderBinding.tifLayout.visibility = View.GONE
+                createOrderBinding.checkPostOnly.visibility = View.GONE
+            }
+            "Trailing Stop" -> {
+                createOrderBinding.edtLimitPrice.visibility = View.VISIBLE
+                createOrderBinding.edtLimitPriceTextInputLayout.hint =
+                    resources.getString(R.string.trailing_amount)
+                createOrderBinding.tifLayout.visibility = View.GONE
+                createOrderBinding.checkPostOnly.visibility = View.GONE
+                createOrderBinding.edtStopPriceTextInputLayout.visibility = View.GONE
+            }
+        }
+
+        if (KotlinUtils.apiDetailsPresent(requireContext())) {
+            createOrderBinding.buyAndSellSwitch.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    createOrderBinding.buyAndSellSwitch.text =
+                        requireContext().resources.getString(R.string.buy_long)
+                    createOrderBinding.buyAndSellSwitch.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.colorBid
+                        )
+                    )
+                    createOrderBinding.btnPlaceOrder.backgroundTintList =
+                        ContextCompat.getColorStateList(requireContext(), R.color.colorBid)
+                } else {
+                    createOrderBinding.buyAndSellSwitch.text =
+                        requireContext().resources.getString(R.string.sell_short)
+                    createOrderBinding.buyAndSellSwitch.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.colorAsk
+                        )
+                    )
+                    createOrderBinding.btnPlaceOrder.backgroundTintList =
+                        ContextCompat.getColorStateList(requireContext(), R.color.colorAsk)
+                }
+            }
+        }
+
+        createOrderBinding.leverageSeeker.onSeekChangeListener = object : OnSeekChangeListener {
+            override fun onSeeking(seekParams: SeekParams) {
+                Log.i(logTag, seekParams.seekBar.toString())
+                Log.i(logTag, seekParams.progress.toString())
+                Log.i(logTag, seekParams.progressFloat.toString())
+                Log.i(logTag, seekParams.fromUser.toString())
+                //when tick count > 0
+                Log.i(logTag, seekParams.thumbPosition.toString())
+                Log.i(logTag, seekParams.tickText)
+                createOrderBinding.leverageTxt.text = seekParams.tickText
+                currentLeverage.text =
+                    resources.getString(R.string.current_leverage).plus(seekParams.tickText)
+
+                val changeOrderLeverageBody = ChangeOrderLeverageBody()
+                changeOrderLeverageBody.productId =
+                    appPreferenceManager!!.currentProductId!!.toInt()
+                when (seekParams.progress) {
+                    0 -> {
+                        changeOrderLeverageBody.leverage = "1.0"
+                    }
+                    14 -> {
+                        changeOrderLeverageBody.leverage = "2.0"
+                    }
+                    29 -> {
+                        changeOrderLeverageBody.leverage = "3.0"
+                    }
+                    43 -> {
+                        changeOrderLeverageBody.leverage = "5.0"
+                    }
+                    57 -> {
+                        changeOrderLeverageBody.leverage = "10.0"
+                    }
+                    71 -> {
+                        changeOrderLeverageBody.leverage = "25.0"
+                    }
+                    86 -> {
+                        changeOrderLeverageBody.leverage = "50.0"
+                    }
+                    100 -> {
+                        changeOrderLeverageBody.leverage = "100.0"
+                    }
+                }
+
+                val timeStampSetOrderLeverage = KotlinUtils.generateTimeStamp()
+                val methodSetOrderLeverage = "POST"
+                val pathSetOrderLeverage = "/orders/leverage"
+                val queryStringSetOrderLeverage = ""
+                val gson = Gson()
+                val payloadSetOrderLeverage =
+                    gson.toJson(changeOrderLeverageBody).toString()
+                val signatureDataSetOrderLeverage =
+                    methodSetOrderLeverage + timeStampSetOrderLeverage + pathSetOrderLeverage + queryStringSetOrderLeverage + payloadSetOrderLeverage
+                val signatureSetOrderLeverage = KotlinUtils.generateSignature(
+                    signatureDataSetOrderLeverage,
+                    appPreferenceManager!!.apiSecret!!
+                )
+
+                val progressBar = KotlinUtils.showProgressBar(
+                    requireActivity(),
+                    requireContext().resources.getString(R.string.please_wait)
+                )
+                val observeOrderLeverage = service!!.setOrderLeverage(
+                    appPreferenceManager!!.apiKey!!,
+                    timeStampSetOrderLeverage,
+                    signatureSetOrderLeverage!!,
+                    changeOrderLeverageBody
+                )
+
+                observeOrderLeverage.enqueue(object :
+                    Callback<ResponseBody?> {
+                    override fun onResponse(
+                        call: Call<ResponseBody?>?,
+                        response: Response<ResponseBody?>
+                    ) {
+                        if (response.code() == 200) {
+                            Toasty.success(
+                                requireContext(),
+                                requireContext().getString(R.string.order_leverage_changed_successfully),
+                                Toast.LENGTH_SHORT,
+                                true
+                            ).show()
+                        } else {
+                            val errorBody = Gson().fromJson(
+                                response.errorBody()!!.charStream(),
+                                ErrorResponse::class.java
+                            )
+                            Toasty.error(
+                                requireContext(),
+                                errorBody.message!!,
+                                Toast.LENGTH_SHORT,
+                                true
+                            ).show()
+                        }
+                        progressBar.dismiss()
+                    }
+
+                    override fun onFailure(call: Call<ResponseBody?>?, error: Throwable?) {
+                        when (error) {
+                            is NoConnectivityException -> {
+                                Toasty.info(
+                                    requireContext(),
+                                    requireContext().getString(R.string.active_network_connection_required),
+                                    Toast.LENGTH_SHORT,
+                                    true
+                                ).show()
+                            }
+                            is ConnectException -> {
+                                Toasty.error(
+                                    requireContext(),
+                                    requireContext().getString(R.string.server_not_responding),
+                                    Toast.LENGTH_SHORT,
+                                    true
+                                ).show()
+                            }
+                            is SocketTimeoutException -> {
+                                Toasty.error(
+                                    requireContext(),
+                                    requireContext().getString(R.string.connection_timeout),
+                                    Toast.LENGTH_SHORT,
+                                    true
+                                ).show()
+                            }
+                            else -> {
+                                Toasty.error(
+                                    requireContext(),
+                                    requireContext().getString(R.string.something_wrong),
+                                    Toast.LENGTH_SHORT,
+                                    true
+                                ).show()
+                                error!!.printStackTrace()
+                            }
+                        }
+                        progressBar.dismiss()
+                    }
+                })
+            }
+
+            override fun onStartTrackingTouch(seekBar: TickSeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: TickSeekBar?) {}
+        }
+
+        createOrderBinding.checkPostOnly.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked && !createOrderBinding.checkedGTC.isChecked) {
+                createOrderBinding.checkPostOnly.isChecked = false
+                Toasty.error(
+                    requireContext(),
+                    requireContext().getString(R.string.post_only_flag_is_for_gtc),
+                    Toast.LENGTH_SHORT,
+                    true
+                ).show()
+            }
+        }
+
+        createOrderBinding.checkedFOK.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked && createOrderBinding.checkPostOnly.isChecked) {
+                createOrderBinding.checkPostOnly.isChecked = false
+                Toasty.error(
+                    requireContext(),
+                    requireContext().getString(R.string.post_only_flag_is_for_gtc),
+                    Toast.LENGTH_SHORT,
+                    true
+                ).show()
+            }
+        }
+
+        createOrderBinding.checkedIOC.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked && createOrderBinding.checkPostOnly.isChecked) {
+                createOrderBinding.checkPostOnly.isChecked = false
+                Toasty.error(
+                    requireContext(),
+                    requireContext().getString(R.string.post_only_flag_is_for_gtc),
+                    Toast.LENGTH_SHORT,
+                    true
+                ).show()
+            }
+        }
+
+        createOrderBinding.btnPlaceOrder.setOnClickListener {
+            if (createOrderBinding.orderTypeSpinner.selectedItem.toString().equals("Limit", true)) {
+                if (createOrderBinding.edtLimitPrice.text!!.isNotEmpty() && createOrderBinding.edtQuantity.text!!.isNotEmpty()) {
+                    if (createOrderBinding.edtLimitPrice.text!!.toString()
+                            .toDouble() != 0.0 && edtQuantity.text!!.toString()
+                            .toDouble() != 0.0
+                    ) {
+                        val createOrderRequest = CreateOrderRequest()
+                        createOrderRequest.orderType =
+                            CreateOrderRequest.OrderType.limit_order
+                        if (buyAndSellSwitch.isChecked) {
+                            createOrderRequest.side = CreateOrderRequest.Side.sell
+                        } else {
+                            createOrderRequest.side = CreateOrderRequest.Side.buy
+                        }
+                        createOrderRequest.productId =
+                            appPreferenceManager!!.currentProductId!!.toInt()
+                        createOrderRequest.limitPrice =
+                            createOrderBinding.edtLimitPrice.text.toString()
+                        createOrderRequest.size =
+                            createOrderBinding.edtQuantity.text.toString().toInt()
+                        when {
+                            createOrderBinding.checkedGTC.isChecked -> {
+                                createOrderRequest.timeInForce =
+                                    CreateOrderRequest.TimeInForce.gtc
+                            }
+                            createOrderBinding.checkedFOK.isChecked -> {
+                                createOrderRequest.timeInForce =
+                                    CreateOrderRequest.TimeInForce.fok
+                            }
+                            createOrderBinding.checkedIOC.isChecked -> {
+                                createOrderRequest.timeInForce =
+                                    CreateOrderRequest.TimeInForce.ioc
+                            }
+                        }
+                        if (createOrderBinding.checkPostOnly.isChecked) {
+                            createOrderRequest.postOnly = "true"
+                        } else {
+                            createOrderRequest.postOnly = "false"
+                        }
+                        if (createOrderBinding.checkReduceOnly.isChecked) {
+                            createOrderRequest.reduceOnly = "true"
+                        } else {
+                            createOrderRequest.reduceOnly = "false"
+                        }
+                        CoroutineScope(Dispatchers.Main).launch {
+                            placeOrder(createOrderRequest, true, createOrderBinding)
+                        }
+                    } else {
+                        if (createOrderBinding.edtLimitPrice.text.toString().toDouble() == 0.0) {
+                            Toasty.error(
+                                requireContext(),
+                                requireContext().getString(R.string.limit_price_is_zero),
+                                Toast.LENGTH_SHORT,
+                                true
+                            ).show()
+                        }
+                        if (createOrderBinding.edtQuantity.text.toString().toDouble() == 0.0) {
+                            Toasty.error(
+                                requireContext(),
+                                requireContext().getString(R.string.quantity_is_zero),
+                                Toast.LENGTH_SHORT,
+                                true
+                            ).show()
+                        }
+                    }
+                } else {
+                    if (createOrderBinding.edtLimitPrice.text.isNullOrEmpty()) {
+                        Toasty.error(
+                            requireContext(),
+                            requireContext().getString(R.string.limit_price_is_empty),
+                            Toast.LENGTH_SHORT,
+                            true
+                        ).show()
+                    }
+                    if (createOrderBinding.edtQuantity.text.isNullOrEmpty()) {
+                        Toasty.error(
+                            requireContext(),
+                            requireContext().getString(R.string.quantity_is_empty),
+                            Toast.LENGTH_SHORT,
+                            true
+                        ).show()
+                    }
+                }
+            } else if (createOrderBinding.orderTypeSpinner.selectedItem.toString()
+                    .equals("Market", true)
+            ) {
+                if (createOrderBinding.edtQuantity.text!!.isNotEmpty()) {
+                    if (createOrderBinding.edtQuantity.text!!.toString().toDouble() != 0.0) {
+                        val createOrderRequest = CreateOrderRequest()
+                        createOrderRequest.orderType =
+                            CreateOrderRequest.OrderType.market_order
+                        if (buyAndSellSwitch.isChecked) {
+                            createOrderRequest.side = CreateOrderRequest.Side.sell
+                        } else {
+                            createOrderRequest.side = CreateOrderRequest.Side.buy
+                        }
+                        createOrderRequest.productId =
+                            appPreferenceManager!!.currentProductId!!.toInt()
+                        createOrderRequest.size =
+                            createOrderBinding.edtQuantity.text.toString().toInt()
+                        if (createOrderBinding.checkReduceOnly.isChecked) {
+                            createOrderRequest.reduceOnly = "true"
+                        } else {
+                            createOrderRequest.reduceOnly = "false"
+                        }
+                        CoroutineScope(Dispatchers.Main).launch {
+                            placeOrder(createOrderRequest, true, createOrderBinding)
+                        }
+                    } else {
+                        if (createOrderBinding.edtQuantity.text.toString().toDouble() == 0.0) {
+                            Toasty.error(
+                                requireContext(),
+                                requireContext().getString(R.string.quantity_is_zero),
+                                Toast.LENGTH_SHORT,
+                                true
+                            ).show()
+                        }
+                    }
+                } else {
+                    if (createOrderBinding.edtQuantity.text.isNullOrEmpty()) {
+                        Toasty.error(
+                            requireContext(),
+                            requireContext().getString(R.string.quantity_is_empty),
+                            Toast.LENGTH_SHORT,
+                            true
+                        ).show()
+                    }
+                }
+            } else if (createOrderBinding.orderTypeSpinner.selectedItem.toString()
+                    .equals("Stop Limit", true)
+            ) {
+                if (createOrderBinding.edtLimitPrice.text!!.isNotEmpty() && createOrderBinding.edtQuantity.text!!.isNotEmpty()) {
+                    if (createOrderBinding.edtLimitPrice.text!!.toString()
+                            .toDouble() != 0.0 && edtQuantity.text!!.toString()
+                            .toDouble() != 0.0
+                    ) {
+                        val createOrderRequest = CreateOrderRequest()
+                        createOrderRequest.orderType =
+                            CreateOrderRequest.OrderType.limit_order
+                        if (buyAndSellSwitch.isChecked) {
+                            createOrderRequest.side = CreateOrderRequest.Side.sell
+                        } else {
+                            createOrderRequest.side = CreateOrderRequest.Side.buy
+                        }
+                        createOrderRequest.productId =
+                            appPreferenceManager!!.currentProductId!!.toInt()
+                        createOrderRequest.limitPrice =
+                            createOrderBinding.edtLimitPrice.text.toString()
+                        createOrderRequest.stopPrice =
+                            createOrderBinding.edtStopPrice.text.toString()
+                        createOrderRequest.size = edtQuantity.text.toString().toInt()
+                        createOrderRequest.stopOrderType = "stop_loss_order"
+                        if (createOrderBinding.checkReduceOnly.isChecked) {
+                            createOrderRequest.reduceOnly = "true"
+                        } else {
+                            createOrderRequest.reduceOnly = "false"
+                        }
+                        CoroutineScope(Dispatchers.Main).launch {
+                            placeOrder(createOrderRequest, true, createOrderBinding)
+                        }
+                    } else {
+                        if (createOrderBinding.edtLimitPrice.text.toString().toDouble() == 0.0) {
+                            Toasty.error(
+                                requireContext(),
+                                requireContext().getString(R.string.limit_price_is_zero),
+                                Toast.LENGTH_SHORT,
+                                true
+                            ).show()
+                        }
+                        if (createOrderBinding.edtStopPrice.text.toString().toDouble() == 0.0) {
+                            Toasty.error(
+                                requireContext(),
+                                requireContext().getString(R.string.stop_price_is_zero),
+                                Toast.LENGTH_SHORT,
+                                true
+                            ).show()
+                        }
+                        if (edtQuantity.text.toString().toDouble() == 0.0) {
+                            Toasty.error(
+                                requireContext(),
+                                requireContext().getString(R.string.quantity_is_zero),
+                                Toast.LENGTH_SHORT,
+                                true
+                            ).show()
+                        }
+                    }
+                } else {
+                    if (createOrderBinding.edtLimitPrice.text.isNullOrEmpty()) {
+                        Toasty.error(
+                            requireContext(),
+                            requireContext().getString(R.string.limit_price_is_empty),
+                            Toast.LENGTH_SHORT,
+                            true
+                        ).show()
+                    }
+                    if (createOrderBinding.edtStopPrice.text.isNullOrEmpty()) {
+                        Toasty.error(
+                            requireContext(),
+                            requireContext().getString(R.string.stop_price_is_empty),
+                            Toast.LENGTH_SHORT,
+                            true
+                        ).show()
+                    }
+                    if (createOrderBinding.edtQuantity.text.isNullOrEmpty()) {
+                        Toasty.error(
+                            requireContext(),
+                            requireContext().getString(R.string.quantity_is_empty),
+                            Toast.LENGTH_SHORT,
+                            true
+                        ).show()
+                    }
+                }
+            } else if (createOrderBinding.orderTypeSpinner.selectedItem.toString()
+                    .equals("Stop Market", true)
+            ) {
+                if (createOrderBinding.edtStopPrice.text!!.isNotEmpty() && createOrderBinding.edtQuantity.text!!.isNotEmpty()) {
+                    if (createOrderBinding.edtLimitPrice.text!!.toString()
+                            .toDouble() != 0.0 && edtQuantity.text!!.toString()
+                            .toDouble() != 0.0
+                    ) {
+                        val createOrderRequest = CreateOrderRequest()
+                        createOrderRequest.orderType =
+                            CreateOrderRequest.OrderType.market_order
+                        if (buyAndSellSwitch.isChecked) {
+                            createOrderRequest.side = CreateOrderRequest.Side.sell
+                        } else {
+                            createOrderRequest.side = CreateOrderRequest.Side.buy
+                        }
+                        createOrderRequest.productId =
+                            appPreferenceManager!!.currentProductId!!.toInt()
+                        createOrderRequest.stopPrice =
+                            createOrderBinding.edtStopPrice.text.toString()
+                        createOrderRequest.size = edtQuantity.text.toString().toInt()
+                        createOrderRequest.closeOnTrigger = "false"
+                        createOrderRequest.stopOrderType = "stop_loss_order"
+                        if (createOrderBinding.checkReduceOnly.isChecked) {
+                            createOrderRequest.reduceOnly = "true"
+                        } else {
+                            createOrderRequest.reduceOnly = "false"
+                        }
+                        CoroutineScope(Dispatchers.Main).launch {
+                            placeOrder(createOrderRequest, true, createOrderBinding)
+                        }
+                    } else {
+                        if (createOrderBinding.edtStopPrice.text.toString().toDouble() == 0.0) {
+                            Toasty.error(
+                                requireContext(),
+                                requireContext().getString(R.string.stop_price_is_zero),
+                                Toast.LENGTH_SHORT,
+                                true
+                            ).show()
+                        }
+                        if (createOrderBinding.edtQuantity.text.toString().toDouble() == 0.0) {
+                            Toasty.error(
+                                requireContext(),
+                                requireContext().getString(R.string.quantity_is_zero),
+                                Toast.LENGTH_SHORT,
+                                true
+                            ).show()
+                        }
+                    }
+                } else {
+                    if (createOrderBinding.edtStopPrice.text.isNullOrEmpty()) {
+                        Toasty.error(
+                            requireContext(),
+                            requireContext().getString(R.string.stop_price_is_empty),
+                            Toast.LENGTH_SHORT,
+                            true
+                        ).show()
+                    }
+                    if (createOrderBinding.edtQuantity.text.isNullOrEmpty()) {
+                        Toasty.error(
+                            requireContext(),
+                            requireContext().getString(R.string.quantity_is_empty),
+                            Toast.LENGTH_SHORT,
+                            true
+                        ).show()
+                    }
+                }
+            } else if (createOrderBinding.orderTypeSpinner.selectedItem.toString()
+                    .equals("Trailing Stop", true)
+            ) {
+                if (createOrderBinding.edtLimitPrice.text!!.isNotEmpty() && createOrderBinding.edtQuantity.text!!.isNotEmpty()) {
+                    if (createOrderBinding.edtLimitPrice.text!!.toString()
+                            .toDouble() != 0.0 && edtQuantity.text!!.toString()
+                            .toDouble() != 0.0
+                    ) {
+                        val createOrderRequest = CreateOrderRequest()
+                        createOrderRequest.orderType =
+                            CreateOrderRequest.OrderType.market_order
+                        if (buyAndSellSwitch.isChecked) {
+                            createOrderRequest.side = CreateOrderRequest.Side.sell
+                        } else {
+                            createOrderRequest.side = CreateOrderRequest.Side.buy
+                        }
+                        createOrderRequest.productId =
+                            appPreferenceManager!!.currentProductId!!.toInt()
+                        createOrderRequest.trailAmount =
+                            createOrderBinding.edtLimitPrice.text.toString()
+                        createOrderRequest.size = edtQuantity.text.toString().toInt()
+                        createOrderRequest.closeOnTrigger = "false"
+                        createOrderRequest.stopOrderType = "stop_loss_order"
+                        if (createOrderBinding.checkReduceOnly.isChecked) {
+                            createOrderRequest.reduceOnly = "true"
+                        } else {
+                            createOrderRequest.reduceOnly = "false"
+                        }
+                        CoroutineScope(Dispatchers.Main).launch {
+                            placeOrder(createOrderRequest, true, createOrderBinding)
+                        }
+                    } else {
+                        if (createOrderBinding.edtLimitPrice.text.toString().toDouble() == 0.0) {
+                            Toasty.error(
+                                requireContext(),
+                                requireContext().getString(R.string.trailing_amount_is_zero),
+                                Toast.LENGTH_SHORT,
+                                true
+                            ).show()
+                        }
+                        if (createOrderBinding.edtQuantity.text.toString().toDouble() == 0.0) {
+                            Toasty.error(
+                                requireContext(),
+                                requireContext().getString(R.string.quantity_is_zero),
+                                Toast.LENGTH_SHORT,
+                                true
+                            ).show()
+                        }
+                    }
+                } else {
+                    if (createOrderBinding.edtLimitPrice.text.isNullOrEmpty()) {
+                        Toasty.error(
+                            requireContext(),
+                            requireContext().getString(R.string.trailing_amount_is_empty),
+                            Toast.LENGTH_SHORT,
+                            true
+                        ).show()
+                    }
+                    if (createOrderBinding.edtQuantity.text.isNullOrEmpty()) {
+                        Toasty.error(
+                            requireContext(),
+                            requireContext().getString(R.string.quantity_is_empty),
+                            Toast.LENGTH_SHORT,
+                            true
+                        ).show()
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun placeOrder(
+        createOrderRequest: CreateOrderRequest,
+        isDialog: Boolean,
+        createOrderBinding: CreateOrderBinding?
+    ) {
         val dialog = KotlinUtils.showProgressBar(
             requireActivity(),
             requireContext().resources.getString(R.string.please_wait)
@@ -945,9 +1101,15 @@ class OrderFragment : BaseFragment() {
                             true
                         ).show()
                         sectionsPagerAdapter!!.notifyDataSetChanged()
-                        edtLimitPrice.editableText.clear()
-                        edtStopPrice.editableText.clear()
-                        edtQuantity.editableText.clear()
+                        if (isDialog) {
+                            createOrderBinding!!.edtLimitPrice.editableText.clear()
+                            createOrderBinding.edtStopPrice.editableText.clear()
+                            createOrderBinding.edtQuantity.editableText.clear()
+                        } else {
+                            //edtLimitPrice.editableText.clear()
+                            edtPrice.editableText.clear()
+                            edtQuantity.editableText.clear()
+                        }
                     } else {
                         val errorBody = Gson().fromJson(
                             response.errorBody()!!.charStream(),

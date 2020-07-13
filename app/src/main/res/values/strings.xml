@@ -102,4 +102,10 @@
     <string name="x">X</string>
     <string name="order_cancelled_successfully">Order cancelled successfully!!</string>
     <string name="stop_orders">Stop Orders</string>
+    <string name="show_advanced_order_form">Show advanced order form</string>
+    <string name="current_leverage">Current Leverage : </string>
+    <string name="price_is_zero">Price can\'t be zero</string>
+    <string name="price_is_empty">Price is empty</string>
+    <string name="product_symbols_list_preference">product_symbols_list_preference</string>
+    <string name="mark_price">Mark Price</string>
 </resources>

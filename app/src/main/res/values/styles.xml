@@ -62,4 +62,9 @@
         <item name="android:textColorPrimary">@color/primaryTextColor</item>
     </style>
 
+    <style name="createOrderDialog" parent="Theme.MaterialComponents.Dialog.Alert">
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:textColorPrimary">@color/primaryTextColor</item>
+        <item name="android:textColorSecondary">@color/colorAccent</item>
+    </style>
 </resources>

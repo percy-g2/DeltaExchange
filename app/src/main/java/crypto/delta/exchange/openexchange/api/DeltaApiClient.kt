@@ -23,7 +23,7 @@ class DeltaApiClient {
         if (retrofit == null) {
             // set your desired log level
             if (BuildConfig.DEBUG) {
-                logging.setLevel(HttpLoggingInterceptor.Level.BODY)
+                logging.setLevel(HttpLoggingInterceptor.Level.NONE)
             } else {
                 logging.setLevel(HttpLoggingInterceptor.Level.NONE)
             }

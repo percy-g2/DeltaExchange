@@ -52,7 +52,6 @@ class RecentTradesAdapter(
             holder.tradeSize.setTextColor(ContextCompat.getColor(requireContext, R.color.colorBid))
             holder.tradeTime.setTextColor(ContextCompat.getColor(requireContext, R.color.colorBid))
             holder.tradeTaker.setTextColor(ContextCompat.getColor(requireContext, R.color.colorBid))
-
             holder.tradeTaker.text = "B"
         }
     }

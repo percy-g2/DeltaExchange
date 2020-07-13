@@ -17,6 +17,7 @@ import crypto.delta.exchange.openexchange.BaseViewModel
 import crypto.delta.exchange.openexchange.api.DeltaExchangeSocketServiceRepository
 import crypto.delta.exchange.openexchange.api.DeltaRepository
 import crypto.delta.exchange.openexchange.pojo.*
+import crypto.delta.exchange.openexchange.pojo.products.RecentTradeChannelResponse
 import crypto.delta.exchange.openexchange.utils.AppPreferenceManager
 import crypto.delta.exchange.openexchange.utils.Native
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -64,11 +65,21 @@ class OrderBookViewModel(application: Application) : BaseViewModel(application) 
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 if (it is WebSocket.Event.OnConnectionOpened<*>) {
-                    val channel2 = Channel()
-                    channel2.name = "l2_orderbook"
-                    channel2.symbols = arrayListOf(appPreferenceManager.currentProductSymbol!!)
+                    val channelOrderBook = Channel()
+                    channelOrderBook.name = "l2_orderbook"
+                    channelOrderBook.symbols =
+                        arrayListOf(appPreferenceManager.currentProductSymbol!!)
+                    val channelMarkPrice = Channel()
+                    channelMarkPrice.name = "mark_price"
+                    channelMarkPrice.symbols =
+                        arrayListOf("MARK:".plus(appPreferenceManager.currentProductSymbol!!))
+                    val channelRecentTrade = Channel()
+                    channelRecentTrade.name = "recent_trade"
+                    channelRecentTrade.symbols =
+                        arrayListOf(appPreferenceManager.currentProductSymbol!!)
                     val payload = Payload()
-                    payload.channels = arrayListOf(channel2)
+                    payload.channels =
+                        arrayListOf(channelOrderBook, channelMarkPrice, channelRecentTrade)
                     val subscribe = Subscribe(
                         "subscribe",
                         payload
@@ -92,7 +103,9 @@ class OrderBookViewModel(application: Application) : BaseViewModel(application) 
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ any ->
-                if (!any.toString().contains("subscription".toRegex())) {
+                if (any.toString().contains("l2_orderbook".toRegex()) && !any.toString()
+                        .contains("subscriptions".toRegex())
+                ) {
                     if (null != any) {
                         val data = any.toString().replace("size", "d_size")
                         val gson = Gson()
@@ -126,17 +139,97 @@ class OrderBookViewModel(application: Application) : BaseViewModel(application) 
         return orderBookData
     }
 
+    fun observeMarkPrice(): MutableLiveData<MarkPriceResponse> {
+        val orderBookData: MutableLiveData<MarkPriceResponse> =
+            MutableLiveData()
+        deltaExchangeSocketServiceRepository!!.observeOrderBook()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ any ->
+                if (any.toString().contains("mark_price".toRegex()) && !any.toString()
+                        .contains("subscriptions".toRegex())
+                ) {
+                    if (null != any) {
+                        val data = any.toString().replace(":", "")
+                        val gson = Gson()
+                        val response =
+                            gson.fromJson(
+                                data,
+                                MarkPriceResponse::class.java
+                            )
+                        orderBookData.value = response
+                    }
+                }
+            }, { error ->
+                Log.e(
+                    OrderBookViewModel::class.java.simpleName,
+                    "Error while observing ticker ${error.cause}"
+                )
+                error.printStackTrace()
+            }).addTo(disposables)
+        return orderBookData
+    }
+
+    fun observeRecentTrade(): MutableLiveData<RecentTradeChannelResponse> {
+        val orderBookData: MutableLiveData<RecentTradeChannelResponse> =
+            MutableLiveData()
+        deltaExchangeSocketServiceRepository!!.observeOrderBook()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ any ->
+                if (any.toString().contains("recent_trade".toRegex()) && !any.toString()
+                        .contains("subscriptions".toRegex()) && !any.toString()
+                        .contains("recent_trade_snapshot".toRegex())
+                ) {
+                    Log.d("observeRecentTrade", any.toString())
+                    if (null != any) {
+                        //  val data = any.toString().replace(":", "")
+                        val gson = Gson()
+                        val response =
+                            gson.fromJson(
+                                any.toString(),
+                                RecentTradeChannelResponse::class.java
+                            )
+                        orderBookData.value = response
+                    }
+                }
+            }, { error ->
+                Log.e(
+                    OrderBookViewModel::class.java.simpleName,
+                    "Error while observing ticker ${error.cause}"
+                )
+                error.printStackTrace()
+            }).addTo(disposables)
+        return orderBookData
+    }
+
     private fun sendSubscribe(action: Subscribe) {
         deltaExchangeSocketServiceRepository!!.sendSubscribe(action)
     }
 
 
-    fun sendUnSubscribe(action: Subscribe) {
+    private fun sendUnSubscribe(action: Subscribe) {
         deltaExchangeSocketServiceRepository!!.sendUnSubscribe(action)
     }
 
     override fun onCleared() {
         super.onCleared()
         disposables.clear()
+        val channelOrderBook = Channel()
+        channelOrderBook.name = "l2_orderbook"
+        channelOrderBook.symbols = arrayListOf()
+        val channelMarkPrice = Channel()
+        channelMarkPrice.name = "mark_price"
+        channelMarkPrice.symbols = arrayListOf()
+        val channelRecentTrade = Channel()
+        channelRecentTrade.name = "recent_trade"
+        channelRecentTrade.symbols = arrayListOf()
+        val payload = Payload()
+        payload.channels = arrayListOf(channelOrderBook, channelMarkPrice)
+        val unsubscribe = Subscribe(
+            "unsubscribe",
+            payload
+        )
+        sendUnSubscribe(unsubscribe)
     }
 }
