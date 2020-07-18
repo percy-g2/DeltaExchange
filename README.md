@@ -1,3 +1,6 @@
+Not working on this project anymore. If anyone interested to fork, improve, add more options and discuss things can create an [issue](https://github.com/percy-g2/DeltaExchange/issues/new/choose) 
+
+
 <p align="left">
   <img src="https://raw.githubusercontent.com/percy-g2/DeltaExchange/master/screenshots/1.png" width="150" height="300" title="startUp">
   <img src="https://raw.githubusercontent.com/percy-g2/DeltaExchange/master/screenshots/2.png" width="150" height="300" title="home">
